@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+	<file source-language="en" product-name="itl_core">
+		<header/>
+		<body>
+			<trans-unit id="apiKey">
+                <source>API key:Please insert your Tinyfy API key</source>
+            </trans-unit>
+		</body>
+	</file>
+</xliff>

@@ -1,0 +1,6 @@
+{
+    "require": {
+        "tinify/tinify": "^1.5",
+        "roave/security-advisories": "dev-master"
+    }
+}
