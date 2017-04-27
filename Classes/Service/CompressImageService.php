@@ -4,6 +4,8 @@ namespace Schmitzal\Tinyimg\Service;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility;
 
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
@@ -20,9 +22,9 @@ class CompressImageService
 
     /**
      * CompressImageService constructor.
-     * @param \TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager
+     * @param ObjectManagerInterface $objectManager
      */
-    public function __construct(\TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager)
+    public function __construct(ObjectManagerInterface $objectManager)
     {
         $this->objectManager = $objectManager;
     }
@@ -46,8 +48,8 @@ class CompressImageService
      */
     protected function getApiKey()
     {
-        /** @var \TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility $configurationUtility */
-        $configurationUtility = $this->objectManager->get('TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility');
+        /** @var ConfigurationUtility $configurationUtility */
+        $configurationUtility = $this->objectManager->get(ConfigurationUtility::class);
         $extensionConfiguration = $configurationUtility->getCurrentConfiguration('tinyimg');
         return $extensionConfiguration['apiKey']['value'];
     }
