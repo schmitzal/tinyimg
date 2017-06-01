@@ -16,9 +16,10 @@ This API can reduce up to 80% of the file size of your images, which will increa
 If you need more, there is a payed version which can be activated in your dashboard (where you got your API key)_</span>
 
 ## Contribution
-
 Bugs and feature requests are welcome. Feel free to create an [issue](https://github.com/schmitzal/tinyimg/issues) and i'll have a look at it as soon as possible.
 
 Code improvements are also highly appreciated, as I'm a young developer and sure there is stuff to optimize.
 
-[![alt text](https://cdn.tinypng.com/images/apng/panda-waving.png)](https://tinypng.com/)
+## Sponsoring
+This extension is powered by [Interlutions GmbH](https://www.interlutions.de/).
+Most of the time working on this extension is at work, so my thanks go to Interlutions. :)
