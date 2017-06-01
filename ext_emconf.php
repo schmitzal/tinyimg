@@ -1,12 +1,12 @@
 <?php
-$EM_CONF[$_EXTKEY] = array(
+$EM_CONF[$_EXTKEY] = [
     'title' => 'Tinyimg',
     'description' => 'Image compression for all pngs and jpgs uploaded to the backend (using the tinypng API)',
     'category' => 'be',
     'author' => 'Alessandro Schmitz',
     'author_email' => 'alessandro.schmitz@interlutions.de',
     'author_company' => 'Interlutions GmbH',
-    'version' => '1.0.1',
+    'version' => '1.1.0',
     'shy' => '',
     'dependencies' => '',
     'conflicts' => '',
@@ -19,12 +19,12 @@ $EM_CONF[$_EXTKEY] = array(
     'modify_tables' => '',
     'clearCacheOnLoad' => 0,
     'lockType' => '',
-    'constraints' => array(
-        'depends' => array(
-            'typo3' => '8.7.0-8.7.99',
-        ),
-        'conflicts' => array(),
-        'suggests' => array(),
-    ),
-    'suggests' => array(),
-);
+    'constraints' => [
+        'depends' => [
+            'typo3' => '7.6.0-8.7.99',
+        ],
+        'conflicts' => [],
+        'suggests' => [],
+    ],
+    'suggests' => [],
+];
