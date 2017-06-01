@@ -10,7 +10,8 @@ This API can reduce up to 80% of the file size of your images, which will increa
 1. Get extension from TER
 2. Create an API key* at https://tinypng.com/developers
 3. Enter the API key* in the extension configuration (using the extension manager)
-4. Have a nice day :)
+4. Include the static TypoScript. It disables compression on the application context "Development" - so you wont loose compressions during development and testing
+5. Have a nice day :)
 
 <span style="font-size: 80%">_*Note that the tinify API is limited to 500 compressions per month.
 If you need more, there is a payed version which can be activated in your dashboard (where you got your API key)_</span>
