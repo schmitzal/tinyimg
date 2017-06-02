@@ -5,5 +5,14 @@
         "typo3/cms": ">=8.7.0",
         "tinify/tinify": "^1.5",
         "roave/security-advisories": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Schmitzal\\Tinyimg\\": "Classes"
+        }
+    },
+    "replace": {
+        "tinyimg": "self.version",
+        "typo3-ter/tinyimg": "self.version"
     }
 }

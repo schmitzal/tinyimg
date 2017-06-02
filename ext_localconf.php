@@ -12,6 +12,7 @@ $signalSlotDispatcher->connect(
     'initializeCompression',
     true
 );
+
 // Register slot when a file has been replaced
 $signalSlotDispatcher->connect(
     \TYPO3\CMS\Core\Resource\ResourceStorage::class,

@@ -1,15 +1,16 @@
 <?php
 namespace Schmitzal\Tinyimg\Service;
 
+use Aws\S3\Exception\S3Exception;
+use Aws\S3\S3Client;
+
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility;
-
-require_once(__DIR__ . '/../../vendor/autoload.php');
 
 /**
  * Class CompressImageService
@@ -22,10 +23,50 @@ class CompressImageService
      * @inject
      */
     protected $objectManager;
+
+    /**
+     * @var array
+     */
+    protected $extConf;
+
     /**
      * @var array
      */
     protected $settings;
+
+    /**
+     * @var S3Client
+     */
+    protected $client = '';
+
+    /**
+     * CompressImageService constructor.
+     */
+    public function __construct(ObjectManagerInterface $objectManager)
+    {
+        $this->objectManager = $objectManager;
+
+        $configurationUtility = $this->objectManager->get(ConfigurationUtility::class);
+        $this->extConf = $configurationUtility->getCurrentConfiguration('tinyimg');
+
+        $this->initCdn();
+    }
+
+    /**
+     * initialize the CDN
+     */
+    public function initCdn()
+    {
+        /** @var S3Client client */
+        $this->client = S3Client::factory(array(
+            'region' => $this->extConf['region']['value'],
+            'version' => $this->extConf['version']['value'],
+            'credentials' => array(
+                'key' => $this->extConf['key']['value'],
+                'secret' => $this->extConf['secret']['value'],
+            ),
+        ));
+    }
 
     /**
      * @param File $file
@@ -36,11 +77,69 @@ class CompressImageService
         \Tinify\setKey($this->getApiKey());
         $this->settings = $this->getTypoScriptConfiguration();
 
-        if ((int)$this->settings['debug'] === 0 &&in_array($file->getExtension(), ['png', 'jpg'], true)) {
-            $publicUrl = PATH_site . $file->getPublicUrl();
-            $source = \Tinify\fromFile($publicUrl);
-            $source->toFile($publicUrl);
+        if ((int)$this->settings['debug'] === 0 && in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
+            if ($this->getUseCdn() && $this->checkIfFolderIsCdn($folder, $file)) {
+                // get the image
+                // no PATH_site as file will be provided by absolute URL of the bucket or the CDN
+                $publicUrl = $file->getPublicUrl();
+
+                // get the temp file and prefix with current time
+                $tempFile = PATH_site . 'typo3temp' . DIRECTORY_SEPARATOR . time() .'_'.  $this->getCdnFileName($publicUrl);
+
+                $source = \Tinify\fromFile($publicUrl);
+
+                // move to temp folder
+                $source->toFile($tempFile);
+
+                // upload to CDN
+                try {
+                    $this->client->putObject([
+                        'Bucket' => $this->extConf['bucket']['value'],
+                        'Key' => $file->getIdentifier(),
+                        'SourceFile' => $tempFile
+                    ]);
+                } catch(S3Exception $e) {
+                    throw new S3Exception($e->getMessage());
+                }
+
+                // remove temp file
+                GeneralUtility::unlink_tempfile($tempFile);
+            } else {
+                $publicUrl = PATH_site . $file->getPublicUrl();
+                $source = \Tinify\fromFile($publicUrl);
+                $source->toFile($publicUrl);
+            }
         }
+    }
+
+    /**
+     * This only works if file does not exist
+     *
+     * @param Folder $folder
+     * @param File $file
+     * @return boolean
+     */
+    public function checkIfFolderIsCdn($folder, $file)
+    {
+        // if this is string, then we know, that there is already a file in the folder
+        // In this case you have to check if the object in the bucket exists
+        if (is_string($folder)) {
+            return $this->client->doesObjectExist(
+                $this->extConf['bucket']['value'],
+                $file->getIdentifier()
+            );
+        }
+
+        return $folder->getStorage()->getDriverType() == 'AusDriverAmazonS3';
+    }
+
+    /**
+     * @param $file string
+     * @return string
+     */
+    public function getCdnFileName($file)
+    {
+        return preg_replace('/^.*\/(.*)$/', '$1', $file);
     }
 
     /**
@@ -48,10 +147,15 @@ class CompressImageService
      */
     protected function getApiKey()
     {
-        /** @var ConfigurationUtility $configurationUtility */
-        $configurationUtility = $this->objectManager->get(ConfigurationUtility::class);
-        $extensionConfiguration = $configurationUtility->getCurrentConfiguration('tinyimg');
-        return $extensionConfiguration['apiKey']['value'];
+        return $this->extConf['apiKey']['value'];
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function getUseCdn()
+    {
+        return $this->extConf['useCdn']['value'];
     }
 
     /**
