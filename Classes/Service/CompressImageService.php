@@ -10,8 +10,6 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility;
 
 require_once (__DIR__ . '/../../vendor/autoload.php');
@@ -41,10 +39,11 @@ class CompressImageService
     /**
      * @var S3Client
      */
-    protected $client = '';
+    protected $client = null;
 
     /**
      * CompressImageService constructor.
+     * @throws \BadFunctionCallException
      */
     public function initAction()
     {
@@ -52,7 +51,9 @@ class CompressImageService
         $configurationUtility = $this->objectManager->get(ConfigurationUtility::class);
         $this->extConf = $configurationUtility->getCurrentConfiguration('tinyimg');
 
-        $this->initCdn();
+        if (ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3')) {
+            $this->initCdn();
+        }
     }
 
     /**
@@ -165,7 +166,7 @@ class CompressImageService
             );
         }
 
-        return $folder->getStorage()->getDriverType() == 'AusDriverAmazonS3';
+        return $folder->getStorage()->getDriverType() === 'AusDriverAmazonS3';
     }
 
     /**
@@ -195,6 +196,7 @@ class CompressImageService
 
     /**
      * @return array
+     * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
      */
     protected function getTypoScriptConfiguration()
     {
