@@ -3,13 +3,12 @@ namespace Schmitzal\Tinyimg\Service;
 
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Resource\Index\Indexer;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility;
 
-require_once(__DIR__ . '/../../vendor/autoload.php');
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 /**
  * Class CompressImageService
@@ -41,6 +40,8 @@ class CompressImageService
             $source = \Tinify\fromFile($publicUrl);
             $source->toFile($publicUrl);
         }
+
+        $this->updateFileInformation($file);
     }
 
     /**
@@ -56,6 +57,7 @@ class CompressImageService
 
     /**
      * @return array
+     * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
      */
     protected function getTypoScriptConfiguration()
     {
@@ -66,5 +68,15 @@ class CompressImageService
             ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
             'tinyimg'
         );
+    }
+
+    /**
+     * @param File $file
+     */
+    protected function updateFileInformation($file)
+    {
+        /** @var Indexer $fileIndexer */
+        $fileIndexer = $this->objectManager->get(Indexer::class, $file->getStorage());
+        $fileIndexer->updateIndexEntry($file);
     }
 }
