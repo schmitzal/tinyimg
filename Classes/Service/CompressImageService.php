@@ -8,11 +8,12 @@ use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Resource\Index\Indexer;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility;
 
-require_once (__DIR__ . '/../../vendor/autoload.php');
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 /**
  * Class CompressImageService
@@ -92,6 +93,8 @@ class CompressImageService
                 $source->toFile($publicUrl);
             }
         }
+
+        $this->updateFileInformation($file);
     }
 
     /**
@@ -207,5 +210,15 @@ class CompressImageService
             ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
             'tinyimg'
         );
+    }
+
+    /**
+     * @param File $file
+     */
+    protected function updateFileInformation($file)
+    {
+        /** @var Indexer $fileIndexer */
+        $fileIndexer = $this->objectManager->get(Indexer::class, $file->getStorage());
+        $fileIndexer->updateIndexEntry($file);
     }
 }
