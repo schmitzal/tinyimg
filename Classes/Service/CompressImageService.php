@@ -10,8 +10,11 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility;
+
+require_once (__DIR__ . '/../../vendor/autoload.php');
 
 /**
  * Class CompressImageService
@@ -20,7 +23,8 @@ use TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility;
 class CompressImageService
 {
     /**
-     * @var \TYPO3\CMS\Extbase\Object\ObjectManager
+     * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
+     * @inject
      */
     protected $objectManager;
 
@@ -42,10 +46,9 @@ class CompressImageService
     /**
      * CompressImageService constructor.
      */
-    public function __construct(ObjectManagerInterface $objectManager)
+    public function initAction()
     {
-        $this->objectManager = $objectManager;
-
+        /** @var ConfigurationUtility $configurationUtility */
         $configurationUtility = $this->objectManager->get(ConfigurationUtility::class);
         $this->extConf = $configurationUtility->getCurrentConfiguration('tinyimg');
 
@@ -74,6 +77,8 @@ class CompressImageService
      */
     public function initializeCompression($file, $folder)
     {
+        $this->initAction();
+
         \Tinify\setKey($this->getApiKey());
         $this->settings = $this->getTypoScriptConfiguration();
 
@@ -93,8 +98,8 @@ class CompressImageService
      * Additionally it checks if CDN is actually set and
      * your located in the CDN section of the file list
      *
-     * @param File $folder
-     * @param Folder $file
+     * @param Folder $folder
+     * @param File $file
      * @return bool
      */
     public function checkForAmazonCdn($folder, $file)
