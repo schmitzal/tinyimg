@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -20,7 +21,6 @@ class CompressImageService
 {
     /**
      * @var \TYPO3\CMS\Extbase\Object\ObjectManager
-     * @inject
      */
     protected $objectManager;
 
@@ -78,38 +78,68 @@ class CompressImageService
         $this->settings = $this->getTypoScriptConfiguration();
 
         if ((int)$this->settings['debug'] === 0 && in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
-            if ($this->getUseCdn() && $this->checkIfFolderIsCdn($folder, $file)) {
-                // get the image
-                // no PATH_site as file will be provided by absolute URL of the bucket or the CDN
-                $publicUrl = $file->getPublicUrl();
-
-                // get the temp file and prefix with current time
-                $tempFile = PATH_site . 'typo3temp' . DIRECTORY_SEPARATOR . time() .'_'.  $this->getCdnFileName($publicUrl);
-
-                $source = \Tinify\fromFile($publicUrl);
-
-                // move to temp folder
-                $source->toFile($tempFile);
-
-                // upload to CDN
-                try {
-                    $this->client->putObject([
-                        'Bucket' => $this->extConf['bucket']['value'],
-                        'Key' => $file->getIdentifier(),
-                        'SourceFile' => $tempFile
-                    ]);
-                } catch(S3Exception $e) {
-                    throw new S3Exception($e->getMessage());
-                }
-
-                // remove temp file
-                GeneralUtility::unlink_tempfile($tempFile);
+            if ($this->checkForAmazonCdn($folder, $file)) {
+                $this->pushToTinyPngAndStoreToCdn($file);
             } else {
                 $publicUrl = PATH_site . $file->getPublicUrl();
                 $source = \Tinify\fromFile($publicUrl);
                 $source->toFile($publicUrl);
             }
         }
+    }
+
+    /**
+     * Check if the aus driver extension exists and is loaded.
+     * Additionally it checks if CDN is actually set and
+     * your located in the CDN section of the file list
+     *
+     * @param File $folder
+     * @param Folder $file
+     * @return bool
+     */
+    public function checkForAmazonCdn($folder, $file)
+    {
+        return ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3') &&
+        $this->getUseCdn() &&
+        $this->checkIfFolderIsCdn($folder, $file);
+    }
+
+    /**
+     * Creates a temp file from original resource.
+     * Pushes the temp image file to tinypng compression service.
+     * Overrides the original temp file with the compressed on.
+     * Puts the compressed temp image to the actual storeage in file list -> CDN
+     * Deletes old temp file.
+     *
+     * @param File $file
+     */
+    public function pushToTinyPngAndStoreToCdn($file)
+    {
+        // get the image
+        // no PATH_site as file will be provided by absolute URL of the bucket or the CDN
+        $publicUrl = $file->getPublicUrl();
+
+        // get the temp file and prefix with current time
+        $tempFile = PATH_site . 'typo3temp' . DIRECTORY_SEPARATOR . time() .'_'.  $this->getCdnFileName($publicUrl);
+
+        $source = \Tinify\fromFile($publicUrl);
+
+        // move to temp folder
+        $source->toFile($tempFile);
+
+        // upload to CDN
+        try {
+            $this->client->putObject([
+                'Bucket' => $this->extConf['bucket']['value'],
+                'Key' => $file->getIdentifier(),
+                'SourceFile' => $tempFile
+            ]);
+        } catch(S3Exception $e) {
+            throw new S3Exception($e->getMessage());
+        }
+
+        // remove temp file
+        GeneralUtility::unlink_tempfile($tempFile);
     }
 
     /**
