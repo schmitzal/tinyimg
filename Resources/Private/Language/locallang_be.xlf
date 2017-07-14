@@ -6,6 +6,24 @@
 			<trans-unit id="apiKey">
                 <source>API key:Please insert your Tinyfy API key</source>
             </trans-unit>
+			<trans-unit id="useCdn">
+                <source>CDN Usage: Check if you want the files to be pushed to your Amazon S3 bucket</source>
+            </trans-unit>
+			<trans-unit id="bucket">
+                <source>Enter the AWS S3 bucket name</source>
+            </trans-unit>
+			<trans-unit id="secret">
+                <source>Enter you AWS S3 secret</source>
+            </trans-unit>
+			<trans-unit id="key">
+                <source>Enter your AWS S3 key</source>
+            </trans-unit>
+			<trans-unit id="region">
+                <source>Enter the region used in AWS S3</source>
+            </trans-unit>
+			<trans-unit id="version">
+                <source>Enter the AWS version</source>
+            </trans-unit>
 		</body>
 	</file>
 </xliff>
