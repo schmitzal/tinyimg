@@ -40,10 +40,11 @@ class CompressImageService
     /**
      * @var S3Client
      */
-    protected $client = '';
+    protected $client = null;
 
     /**
      * CompressImageService constructor.
+     * @throws \BadFunctionCallException
      */
     public function initAction()
     {
@@ -51,7 +52,9 @@ class CompressImageService
         $configurationUtility = $this->objectManager->get(ConfigurationUtility::class);
         $this->extConf = $configurationUtility->getCurrentConfiguration('tinyimg');
 
-        $this->initCdn();
+        if (ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3')) {
+            $this->initCdn();
+        }
     }
 
     /**
@@ -166,7 +169,7 @@ class CompressImageService
             );
         }
 
-        return $folder->getStorage()->getDriverType() == 'AusDriverAmazonS3';
+        return $folder->getStorage()->getDriverType() === 'AusDriverAmazonS3';
     }
 
     /**
