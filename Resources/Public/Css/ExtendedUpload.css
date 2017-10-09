@@ -2,6 +2,6 @@
     display: none;
 }
 
-.uploading .upload-queue-progress-bar {
+.compressing .upload-queue-progress-bar {
     background-color: orange;
 }
