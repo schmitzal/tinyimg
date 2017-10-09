@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+	<file source-language="en" product-name="tinyimg">
+		<header/>
+		<body>
+			<trans-unit id="compressingLabel">
+                <source>Image is getting compressed...</source>
+            </trans-unit>
+		</body>
+	</file>
+</xliff>
