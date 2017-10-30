@@ -39,7 +39,7 @@ class CompressImagesCommandController extends CommandController
     public function compressCommand()
     {
         /** @var FileStorage $fileStorage */
-        foreach ($this->fileStorageRepository->findAll() as $fileStorage){
+        foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
             $this->compressImagesInStorage($fileStorage);
         }
     }
@@ -58,8 +58,9 @@ class CompressImagesCommandController extends CommandController
         $rootFiles = $fileStorage->getFilesInFolder($rootFolder);
         /*
          * @TODO: Check if this way would be faster, instead of running again and again through a foreach
-         * $rootFiles = $fileStorage->getFilesInFolder($rootFolder, 0 ,0, true, ture);
+         * $rootFiles = $fileStorage->getFilesInFolder($rootFolder, 0, 0, true, true);
          */
+        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump(current($rootFiles)->getProperties());die;
 
         $this->compressImages($rootFiles, $rootFolder);
         $this->compressImagesInFolder($fileStorage, $rootFolder);
@@ -92,14 +93,18 @@ class CompressImagesCommandController extends CommandController
     {
         /** @var File $file */
         foreach ($files as $file) {
-            $this->compressImageService->initializeCompression($file, $folder);
+            if ($file instanceof File) {
+//                $folder = $file->getParentFolder();
+                $this->compressImageService->initializeCompression($file, $folder);
+            }
         }
     }
 
     /**
      * Remove all processed files, so they get generated again after being compressed
      */
-    protected function clearProcessedFiles() {
+    protected function clearProcessedFiles()
+    {
         /** @var ProcessedFileRepository $repository */
         $repository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
         /** @var CacheManager $cacheManager */
