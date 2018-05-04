@@ -26,6 +26,16 @@ class CompressImageService
      * @inject
      */
     protected $objectManager;
+    /**
+     * @var \Schmitzal\Tinyimg\Domain\Repository\FileRepository
+     * @inject
+     */
+    protected $fileRepository;
+    /**
+     * @var \TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface
+     * @inject
+     */
+    protected $persistenceManager;
 
     /**
      * @var array
@@ -76,6 +86,9 @@ class CompressImageService
     /**
      * @param File $file
      * @param Folder $folder
+     * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
+     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
+     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
      */
     public function initializeCompression($file, $folder)
     {
@@ -91,6 +104,7 @@ class CompressImageService
                 $publicUrl = PATH_site . $file->getPublicUrl();
                 $source = \Tinify\fromFile($publicUrl);
                 $source->toFile($publicUrl);
+                $this->setCompressedForCurrentFile($file);
             }
         }
 
@@ -220,5 +234,20 @@ class CompressImageService
         /** @var Indexer $fileIndexer */
         $fileIndexer = $this->objectManager->get(Indexer::class, $file->getStorage());
         $fileIndexer->updateIndexEntry($file);
+    }
+
+    /**
+     * @param File $file
+     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
+     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
+     */
+    protected function setCompressedForCurrentFile(File $file)
+    {
+        /** @var \Schmitzal\Tinyimg\Domain\Model\File $extbaseFileObject */
+        $extbaseFileObject = $this->fileRepository->findByUid($file->getUid());
+        $extbaseFileObject->setCompressed(true);
+
+        $this->fileRepository->update($extbaseFileObject);
+        $this->persistenceManager->persistAll();
     }
 }

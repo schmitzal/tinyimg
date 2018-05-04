@@ -1,33 +1,51 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Domain\Model;
 
-use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
-
 /**
- * Class FileStorage
+ * Class File
  * @package Schmitzal\Tinyimg\Domain\Model
  */
-class FileStorage extends File
+class File extends \TYPO3\CMS\Extbase\Domain\Model\File
 {
     /**
-     * @var string
+     * @var int
      */
-    protected $name = '';
+    protected $storage = 0;
+    /**
+     * @var bool
+     */
+    protected $compressed = false;
 
     /**
-     * @return string
+     * @return int
      */
-    public function getName()
+    public function getStorage()
     {
-        return $this->name;
+        return $this->storage;
     }
 
     /**
-     * @param string $name
+     * @param int $storage
      */
-    public function setName($name)
+    public function setStorage($storage)
     {
-        $this->name = $name;
+        $this->storage = $storage;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCompressed()
+    {
+        return $this->compressed;
+    }
+
+    /**
+     * @param bool $compressed
+     */
+    public function setCompressed($compressed)
+    {
+        $this->compressed = $compressed;
     }
 }
