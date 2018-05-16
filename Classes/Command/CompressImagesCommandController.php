@@ -71,7 +71,9 @@ class CompressImagesCommandController extends CommandController
             if ($file instanceof \Schmitzal\Tinyimg\Domain\Model\File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
                 $folder = $this->resourceFactory->getFolderObjectFromCombinedIdentifier($file->getParentFolder());
-                $this->compressImageService->initializeCompression($file, $folder);
+                if (filesize(GeneralUtility::getFileAbsFileName($file->getPublicUrl())) > 0) {
+                    $this->compressImageService->initializeCompression($file, $folder);
+                }
             }
         }
     }
