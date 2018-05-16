@@ -16,6 +16,13 @@ This API can reduce up to 80% of the file size of your images, which will increa
 <span style="font-size: 80%">_*Note that the tinify API is limited to 500 compressions per month.
 If you need more, there is a payed version which can be activated in your dashboard (where you got your API key)_</span>
 
+## Setup for already existing projects
+This extension contains an extbase command which runs through all files storages and compresses 100 images in it on each run. Depending on the size of this images this takes a while.
+
+Make sure to have an updated index. TYPO3 comes with an index updater as a scheduler task called "File Abstraction Layer: Update storage index (scheduler)".
+
+Also be aware that the tinify API is limited to 500 free compressions (see note above). So on huge websites it will be reached quickly.
+
 ## Contribution
 Bugs and feature requests are welcome. Feel free to create an [issue](https://github.com/schmitzal/tinyimg/issues) and i'll have a look at it as soon as possible.
 

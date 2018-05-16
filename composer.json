@@ -2,7 +2,7 @@
     "name": "schmitzal/tinyimg",
     "type": "typo3-cms-extension",
     "require": {
-        "typo3/cms": ">=8.7.0",
+        "typo3/cms": ">=7.6.0",
         "tinify/tinify": "^1.5",
         "roave/security-advisories": "dev-master"
     },
