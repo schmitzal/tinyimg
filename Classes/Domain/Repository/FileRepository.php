@@ -34,6 +34,7 @@ class FileRepository extends Repository
             $query->logicalAnd([
                 $query->equals('storage', $storage),
                 $query->equals('compressed', false),
+                $query->equals('missing', false),
                 $query->in('extension', ['png', 'jpg', 'jpeg'])
             ])
         );

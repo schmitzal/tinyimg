@@ -3,13 +3,7 @@ namespace Schmitzal\Tinyimg\Command;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
 use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Exception;
-use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderAccessPermissionsException;
-use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\Filter\FileExtensionFilter;
-use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
-use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
@@ -43,6 +37,7 @@ class CompressImagesCommandController extends CommandController
 
     /**
      * Command: compress
+     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      * @throws \TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException
      * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
@@ -53,25 +48,12 @@ class CompressImagesCommandController extends CommandController
     {
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
-            $this->compressImagesInStorage($fileStorage);
+            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 100);
+
+            $this->compressImages($files);
+
+            $this->clearProcessedFiles();
         }
-    }
-
-    /**
-     * @param FileStorage $fileStorage
-     * @throws \TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException
-     * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\InvalidQueryException
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
-     */
-    protected function compressImagesInStorage(FileStorage $fileStorage)
-    {
-        $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage);
-
-        $this->compressImages($files);
-
-//        $this->clearProcessedFiles();
     }
 
     /**
@@ -89,7 +71,6 @@ class CompressImagesCommandController extends CommandController
             if ($file instanceof \Schmitzal\Tinyimg\Domain\Model\File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
                 $folder = $this->resourceFactory->getFolderObjectFromCombinedIdentifier($file->getParentFolder());
-                \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($folder);
                 $this->compressImageService->initializeCompression($file, $folder);
             }
         }
