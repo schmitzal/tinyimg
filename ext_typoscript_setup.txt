@@ -1,0 +1,16 @@
+config.tx_extbase {
+    persistence {
+        classes {
+            Schmitzal\Tinyimg\Domain\Model\FileStorage {
+                mapping {
+                    tableName = sys_file_storage
+                }
+            }
+            Schmitzal\Tinyimg\Domain\Model\File {
+                mapping {
+                    tableName = sys_file
+                }
+            }
+        }
+    }
+}
