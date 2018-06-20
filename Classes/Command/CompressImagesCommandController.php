@@ -1,4 +1,5 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Command;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
@@ -9,8 +10,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 
 /**
- * Class CompressImagesCommandController
- * @package Schmitzal\Tinyimg\Command
+ * Class CompressImagesCommandController.
  */
 class CompressImagesCommandController extends CommandController
 {
@@ -36,7 +36,8 @@ class CompressImagesCommandController extends CommandController
     protected $compressImageService;
 
     /**
-     * Command: compress
+     * Command: compress.
+     *
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      * @throws \TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException
      * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
@@ -58,11 +59,13 @@ class CompressImagesCommandController extends CommandController
 
     /**
      * @param QueryResultInterface $files
-     * @return void
+     *
      * @throws \TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException
      * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
+     *
+     * @return void
      */
     protected function compressImages(QueryResultInterface $files)
     {
@@ -79,7 +82,8 @@ class CompressImagesCommandController extends CommandController
     }
 
     /**
-     * Remove all processed files, so they get generated again after being compressed
+     * Remove all processed files, so they get generated again after being compressed.
+     *
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      */
     protected function clearProcessedFiles()

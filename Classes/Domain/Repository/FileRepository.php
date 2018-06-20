@@ -1,17 +1,17 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Domain\Repository;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
 /**
- * Class FileRepository
- * @package Schmitzal\Tinyimg\Domain\Repository
+ * Class FileRepository.
  */
 class FileRepository extends Repository
 {
     /**
-     * Do not respect storage pid for domain records
+     * Do not respect storage pid for domain records.
      */
     public function createQuery()
     {
@@ -23,9 +23,11 @@ class FileRepository extends Repository
 
     /**
      * @param FileStorage $storage
-     * @param int $limit
-     * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
+     * @param int         $limit
+     *
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\InvalidQueryException
+     *
+     * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
     public function findAllNonCompressedInStorageWithLimit(FileStorage $storage, $limit = 100)
     {
@@ -35,7 +37,7 @@ class FileRepository extends Repository
                 $query->equals('storage', $storage),
                 $query->equals('compressed', false),
                 $query->equals('missing', false),
-                $query->in('extension', ['png', 'jpg', 'jpeg'])
+                $query->in('extension', ['png', 'jpg', 'jpeg']),
             ])
         );
         $query->setLimit($limit);

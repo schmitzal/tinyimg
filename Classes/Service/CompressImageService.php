@@ -1,23 +1,22 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Service;
 
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
-
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Resource\Index\Indexer;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Resource\Index\Indexer;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__.'/../../vendor/autoload.php';
 
 /**
- * Class CompressImageService
- * @package Schmitzal\Tinyimg\Service
+ * Class CompressImageService.
  */
 class CompressImageService
 {
@@ -54,6 +53,7 @@ class CompressImageService
 
     /**
      * CompressImageService constructor.
+     *
      * @throws \BadFunctionCallException
      */
     public function initAction()
@@ -68,24 +68,25 @@ class CompressImageService
     }
 
     /**
-     * initialize the CDN
+     * initialize the CDN.
      */
     public function initCdn()
     {
-        /** @var S3Client client */
-        $this->client = S3Client::factory(array(
-            'region' => $this->extConf['region']['value'],
-            'version' => $this->extConf['version']['value'],
-            'credentials' => array(
-                'key' => $this->extConf['key']['value'],
+        /* @var S3Client client */
+        $this->client = S3Client::factory([
+            'region'      => $this->extConf['region']['value'],
+            'version'     => $this->extConf['version']['value'],
+            'credentials' => [
+                'key'    => $this->extConf['key']['value'],
                 'secret' => $this->extConf['secret']['value'],
-            ),
-        ));
+            ],
+        ]);
     }
 
     /**
-     * @param File $file
+     * @param File   $file
      * @param Folder $folder
+     *
      * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
@@ -97,11 +98,11 @@ class CompressImageService
         \Tinify\setKey($this->getApiKey());
         $this->settings = $this->getTypoScriptConfiguration();
 
-        if ((int)$this->settings['debug'] === 0 && in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
+        if ((int) $this->settings['debug'] === 0 && in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
             if ($this->checkForAmazonCdn($folder, $file)) {
                 $this->pushToTinyPngAndStoreToCdn($file);
             } else {
-                $publicUrl = PATH_site . $file->getPublicUrl();
+                $publicUrl = PATH_site.$file->getPublicUrl();
                 $source = \Tinify\fromFile($publicUrl);
                 $source->toFile($publicUrl);
                 $this->setCompressedForCurrentFile($file);
@@ -114,10 +115,11 @@ class CompressImageService
     /**
      * Check if the aus driver extension exists and is loaded.
      * Additionally it checks if CDN is actually set and
-     * your located in the CDN section of the file list
+     * your located in the CDN section of the file list.
      *
      * @param Folder $folder
-     * @param File $file
+     * @param File   $file
+     *
      * @return bool
      */
     public function checkForAmazonCdn($folder, $file)
@@ -143,7 +145,7 @@ class CompressImageService
         $publicUrl = $file->getPublicUrl();
 
         // get the temp file and prefix with current time
-        $tempFile = PATH_site . 'typo3temp' . DIRECTORY_SEPARATOR . time() .'_'.  $this->getCdnFileName($publicUrl);
+        $tempFile = PATH_site.'typo3temp'.DIRECTORY_SEPARATOR.time().'_'.$this->getCdnFileName($publicUrl);
 
         $source = \Tinify\fromFile($publicUrl);
 
@@ -153,11 +155,11 @@ class CompressImageService
         // upload to CDN
         try {
             $this->client->putObject([
-                'Bucket' => $this->extConf['bucket']['value'],
-                'Key' => $file->getIdentifier(),
-                'SourceFile' => $tempFile
+                'Bucket'     => $this->extConf['bucket']['value'],
+                'Key'        => $file->getIdentifier(),
+                'SourceFile' => $tempFile,
             ]);
-        } catch(S3Exception $e) {
+        } catch (S3Exception $e) {
             throw new S3Exception($e->getMessage());
         }
 
@@ -166,11 +168,12 @@ class CompressImageService
     }
 
     /**
-     * This only works if file does not exist
+     * This only works if file does not exist.
      *
      * @param Folder $folder
-     * @param File $file
-     * @return boolean
+     * @param File   $file
+     *
+     * @return bool
      */
     public function checkIfFolderIsCdn($folder, $file)
     {
@@ -188,6 +191,7 @@ class CompressImageService
 
     /**
      * @param $file string
+     *
      * @return string
      */
     public function getCdnFileName($file)
@@ -204,7 +208,7 @@ class CompressImageService
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     protected function getUseCdn()
     {
@@ -212,8 +216,9 @@ class CompressImageService
     }
 
     /**
-     * @return array
      * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
+     *
+     * @return array
      */
     protected function getTypoScriptConfiguration()
     {
@@ -238,6 +243,7 @@ class CompressImageService
 
     /**
      * @param File $file
+     *
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
      */
