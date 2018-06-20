@@ -1,11 +1,11 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /**
- * Class FileStorage
- * @package Schmitzal\Tinyimg\Domain\Model
+ * Class FileStorage.
  */
 class FileStorage extends AbstractEntity
 {

@@ -3,8 +3,7 @@
 namespace Schmitzal\Tinyimg\Domain\Model;
 
 /**
- * Class File
- * @package Schmitzal\Tinyimg\Domain\Model
+ * Class File.
  */
 class File extends \TYPO3\CMS\Extbase\Domain\Model\File
 {
