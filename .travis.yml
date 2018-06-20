@@ -23,4 +23,4 @@ before_script:
   - composer require squizlabs/php_codesniffer="~2.6"
 
 script:
-  - .Build/bin/phpcs -n --standard=PSR2 --extensions=php ./Classes/
+  - vendor/bin/phpcs -n --standard=PSR2 --extensions=php ./Classes/
