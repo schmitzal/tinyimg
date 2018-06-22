@@ -3,7 +3,9 @@
     "type": "typo3-cms-extension",
     "require": {
         "typo3/cms": ">=7.6.0",
-        "tinify/tinify": "^1.5",
+        "tinify/tinify": "^1.5"
+    },
+    "require-dev": {
         "roave/security-advisories": "dev-master"
     },
     "autoload": {
