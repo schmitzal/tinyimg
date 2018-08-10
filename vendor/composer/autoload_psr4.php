@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Tinify\\' => array($vendorDir . '/tinify/tinify/lib/Tinify'),
+    'Schmitzal\\Tinyimg\\' => array($baseDir . '/Classes'),
 );
