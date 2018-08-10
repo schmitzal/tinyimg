@@ -16,12 +16,20 @@ class ComposerStaticInitd72d73ddddeccf950853a1890e328b60
         array (
             'Tinify\\' => 7,
         ),
+        'S' => 
+        array (
+            'Schmitzal\\Tinyimg\\' => 18,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'Tinify\\' => 
         array (
             0 => __DIR__ . '/..' . '/tinify/tinify/lib/Tinify',
+        ),
+        'Schmitzal\\Tinyimg\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Classes',
         ),
     );
 

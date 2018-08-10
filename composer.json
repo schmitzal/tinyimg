@@ -1,8 +1,9 @@
 {
     "name": "schmitzal/tinyimg",
+    "description": "Image compression for all pngs and jpgs uploaded to the backend (using the tinypng API)",
     "type": "typo3-cms-extension",
     "require": {
-        "typo3/cms": ">=7.6.0",
+        "typo3/cms": ">=7.6.0 <9.5.0",
         "tinify/tinify": "^1.5"
     },
     "autoload": {
