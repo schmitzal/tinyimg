@@ -4,4 +4,8 @@
 
 require_once __DIR__ . '/composer/autoload_real.php';
 
+if (!defined('TYPO3_COMPOSER_MODE')) {
+	define('TYPO3_COMPOSER_MODE', TRUE);
+}
+
 return ComposerAutoloaderInitd72d73ddddeccf950853a1890e328b60::getLoader();
