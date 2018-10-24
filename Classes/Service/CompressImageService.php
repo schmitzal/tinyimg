@@ -11,7 +11,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Resource\Index\Indexer;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -54,13 +53,12 @@ class CompressImageService
 
     /**
      * CompressImageService constructor.
-     * @throws \BadFunctionCallException
+     * @throws \TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException
+     * @throws \TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException
      */
     public function initAction()
     {
-        /** @var ConfigurationUtility $configurationUtility */
-        $configurationUtility = $this->objectManager->get(ConfigurationUtility::class);
-        $this->extConf = $configurationUtility->getCurrentConfiguration('tinyimg');
+        $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyimg']);
 
         if (ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3')) {
             $this->initCdn();
@@ -74,11 +72,11 @@ class CompressImageService
     {
         /** @var S3Client client */
         $this->client = S3Client::factory(array(
-            'region' => $this->extConf['region']['value'],
-            'version' => $this->extConf['version']['value'],
+            'region' => $this->extConf['region'],
+            'version' => $this->extConf['version'],
             'credentials' => array(
-                'key' => $this->extConf['key']['value'],
-                'secret' => $this->extConf['secret']['value'],
+                'key' => $this->extConf['key'],
+                'secret' => $this->extConf['secret'],
             ),
         ));
     }
@@ -86,6 +84,8 @@ class CompressImageService
     /**
      * @param File $file
      * @param Folder $folder
+     * @throws \TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException
+     * @throws \TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException
      * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
@@ -97,7 +97,8 @@ class CompressImageService
         \Tinify\setKey($this->getApiKey());
         $this->settings = $this->getTypoScriptConfiguration();
 
-        if ((int)$this->settings['debug'] === 0 && in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
+        if ((int)$this->settings['debug'] === 0 &&
+            in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
             if ($this->checkForAmazonCdn($folder, $file)) {
                 $this->pushToTinyPngAndStoreToCdn($file);
             } else {
@@ -153,11 +154,11 @@ class CompressImageService
         // upload to CDN
         try {
             $this->client->putObject([
-                'Bucket' => $this->extConf['bucket']['value'],
+                'Bucket' => $this->extConf['bucket'],
                 'Key' => $file->getIdentifier(),
                 'SourceFile' => $tempFile
             ]);
-        } catch(S3Exception $e) {
+        } catch (S3Exception $e) {
             throw new S3Exception($e->getMessage());
         }
 
@@ -178,7 +179,7 @@ class CompressImageService
         // In this case you have to check if the object in the bucket exists
         if (is_string($folder)) {
             return $this->client->doesObjectExist(
-                $this->extConf['bucket']['value'],
+                $this->extConf['bucket'],
                 $file->getIdentifier()
             );
         }
@@ -200,7 +201,7 @@ class CompressImageService
      */
     protected function getApiKey()
     {
-        return $this->extConf['apiKey']['value'];
+        return $this->extConf['apiKey'];
     }
 
     /**
@@ -208,7 +209,7 @@ class CompressImageService
      */
     protected function getUseCdn()
     {
-        return $this->extConf['useCdn']['value'];
+        return $this->extConf['useCdn'];
     }
 
     /**

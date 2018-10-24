@@ -14,3 +14,7 @@ config.tx_extbase {
         }
     }
 }
+
+module.tx_filelist.view {
+    templateRootPaths.0 = EXT:tinyimg/Resources/Private/Templates/
+}
