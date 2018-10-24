@@ -1,0 +1,36 @@
+language: php
+
+matrix:
+  fast_finish: true
+  include:
+    - php: 5.5
+      env: TYPO3_VERSION=^7
+    - php: 5.6
+      env: TYPO3_VERSION=^7
+    - php: 7.0
+      env: TYPO3_VERSION=^7
+    - php: 7.1
+      env: TYPO3_VERSION=^7
+    - php: 7.2
+      env: TYPO3_VERSION=^7
+    - php: 7.0
+      env: TYPO3_VERSION=^8
+    - php: 7.1
+      env: TYPO3_VERSION=^8
+    - php: 7.2
+      env: TYPO3_VERSION=^8
+    - php: 7.2
+      env: TYPO3_VERSION=^9
+
+sudo: false
+
+cache:
+  directories:
+  - $HOME/.composer/cache
+
+before_script:
+  - composer require typo3/minimal="$TYPO3_VERSION"
+  - composer require squizlabs/php_codesniffer="~2.6"
+
+script:
+  - vendor/bin/phpcs -n --standard=PSR2 --extensions=php ./Classes/

@@ -158,7 +158,7 @@ class CompressImageService
                 'Key' => $file->getIdentifier(),
                 'SourceFile' => $tempFile
             ]);
-        } catch(S3Exception $e) {
+        } catch (S3Exception $e) {
             throw new S3Exception($e->getMessage());
         }
 

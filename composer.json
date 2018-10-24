@@ -1,18 +1,43 @@
 {
-  "name": "schmitzal/tinyimg",
-  "description": "Image compression for all pngs and jpgs uploaded to the backend (using the tinypng API)",
-  "type": "typo3-cms-extension",
-  "require": {
-    "typo3/cms-core": "^7.6.0 || ^8.7.0 || ^9.5.0",
-    "tinify/tinify": "^1.5"
-  },
-  "autoload": {
-    "psr-4": {
-      "Schmitzal\\Tinyimg\\": "Classes"
+    "name": "schmitzal/tinyimg",
+    "description": "Image compression for all pngs and jpgs uploaded to the backend (using the tinypng API)",
+    "type": "typo3-cms-extension",
+    "keywords": [
+        "image",
+        "compression",
+        "tinypng",
+        "tinyjpg",
+        "tinify"
+    ],
+    "license": "GPL-3.0-or-later",
+    "support": {
+        "email": "alessandro.schmitz@interlutions.de",
+        "issues": "https://github.com/schmitzal/tinyimg/issues",
+        "source": "https://github.com/schmitzal/tinyimg"
+    },
+    "require": {
+        "typo3/cms-core": "^7.6.0 || ^8.7.0 || ^9.5.0",
+        "tinify/tinify": "^1.5"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "~2.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Schmitzal\\Tinyimg\\": "Classes"
+        }
+    },
+    "replace": {
+        "tinyimg": "self.version",
+        "typo3-ter/tinyimg": "self.version"
+    },
+    "extra": {
+        "typo3/cms": {
+            "cms-package-dir": ".Build/typo3/cms",
+            "web-dir": ".Build/Web",
+            "Package": {
+                "partOfMinimalUsableSystem": true
+            }
+        }
     }
-  },
-  "replace": {
-    "tinyimg": "self.version",
-    "typo3-ter/tinyimg": "self.version"
-  }
 }
