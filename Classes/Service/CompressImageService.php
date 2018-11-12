@@ -83,14 +83,11 @@ class CompressImageService
 
     /**
      * @param File $file
-     * @param Folder $folder
-     * @throws \TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException
-     * @throws \TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException
      * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
      */
-    public function initializeCompression($file, $folder)
+    public function initializeCompression($file)
     {
         $this->initAction();
 
@@ -99,7 +96,7 @@ class CompressImageService
 
         if ((int)$this->settings['debug'] === 0 &&
             in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
-            if ($this->checkForAmazonCdn($folder, $file)) {
+            if ($this->checkForAmazonCdn($file)) {
                 $this->pushToTinyPngAndStoreToCdn($file);
             } else {
                 $publicUrl = PATH_site . $file->getPublicUrl();
@@ -117,15 +114,14 @@ class CompressImageService
      * Additionally it checks if CDN is actually set and
      * your located in the CDN section of the file list
      *
-     * @param Folder $folder
      * @param File $file
      * @return bool
      */
-    public function checkForAmazonCdn($folder, $file)
+    public function checkForAmazonCdn($file)
     {
         return ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3') &&
         $this->getUseCdn() &&
-        $this->checkIfFolderIsCdn($folder, $file);
+        $this->checkIfFolderIsCdn($file);
     }
 
     /**
@@ -169,22 +165,21 @@ class CompressImageService
     /**
      * This only works if file does not exist
      *
-     * @param Folder $folder
      * @param File $file
      * @return boolean
      */
-    public function checkIfFolderIsCdn($folder, $file)
+    public function checkIfFolderIsCdn($file)
     {
         // if this is string, then we know, that there is already a file in the folder
         // In this case you have to check if the object in the bucket exists
-        if (is_string($folder)) {
+        if (is_string($file->getParentFolder())) {
             return $this->client->doesObjectExist(
                 $this->extConf['bucket'],
                 $file->getIdentifier()
             );
         }
 
-        return $folder->getStorage()->getDriverType() === 'AusDriverAmazonS3';
+        return $file->getParentFolder()->getStorage()->getDriverType() === 'AusDriverAmazonS3';
     }
 
     /**
