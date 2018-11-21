@@ -39,5 +39,13 @@
                 "partOfMinimalUsableSystem": true
             }
         }
+    },
+    "scripts": {
+        "ext-get-libs": [
+            "if [ ! -d Libraries/vendor ]; then cd Libraries && composer install; fi"
+        ],
+        "ext-clean": [
+            "rm -rf Libraries/vendor"
+        ]
     }
 }

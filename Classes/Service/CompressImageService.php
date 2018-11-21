@@ -5,14 +5,11 @@ use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Resource\Index\Indexer;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-
-require_once __DIR__ . '/../../vendor/autoload.php';
 
 /**
  * Class CompressImageService
