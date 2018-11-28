@@ -10,10 +10,15 @@
         "tinify"
     ],
     "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Alessandro Schmitz",
+            "role": "Developer",
+            "homepage": "https://www.interlutions.de/"
+        }
+    ],
     "support": {
-        "email": "alessandro.schmitz@interlutions.de",
         "issues": "https://github.com/schmitzal/tinyimg/issues",
-        "source": "https://github.com/schmitzal/tinyimg"
     },
     "require": {
         "typo3/cms-core": "^7.6.0 || ^8.7.0 || ^9.5.0",
@@ -39,13 +44,5 @@
                 "partOfMinimalUsableSystem": true
             }
         }
-    },
-    "scripts": {
-        "ext-get-libs": [
-            "if [ ! -d Libraries/vendor ]; then cd Libraries && composer install; fi"
-        ],
-        "ext-clean": [
-            "rm -rf Libraries/vendor"
-        ]
     }
 }
