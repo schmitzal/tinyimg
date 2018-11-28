@@ -7,7 +7,7 @@
                 <source>API key:Please insert your Tinyfy API key</source>
             </trans-unit>
 			<trans-unit id="useCdn">
-                <source>CDN Usage: Check if you want the files to be pushed to your Amazon S3 bucket</source>
+                <source>CDN Usage: Check if you want the files to be pushed to your Amazon S3 bucket (aus_driver_amazon_s3 required!)</source>
             </trans-unit>
 			<trans-unit id="bucket">
                 <source>Enter the AWS S3 bucket name</source>

@@ -1,5 +1,4 @@
 .idea/
 vendor/
-!vendor/tinify
-!vendor/autoload.php
 .Build/
+/composer.lock
