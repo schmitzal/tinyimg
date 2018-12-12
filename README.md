@@ -29,6 +29,8 @@ Make sure to have an updated index. TYPO3 comes with an index updater as a sched
 
 Also be aware that the tinify API is limited to 500 free compressions (see note above). So on huge websites it will be reached quickly.
 
+To calculate estimated costs for the compression, run the command with the `--countFiles` option first.
+
 ## Contribution
 Bugs and feature requests are welcome. Feel free to create an [issue](https://github.com/schmitzal/tinyimg/issues) and i'll have a look at it as soon as possible.
 
