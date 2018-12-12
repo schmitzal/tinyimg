@@ -53,6 +53,7 @@ class CompressImagesCommandController extends CommandController
             $compressedThisMonth = $this->compressImageService->getCompressionsThisMonthCount();
             $priceCalculation = new PriceCalculation();
             $price = $priceCalculation->calculateCosts($toCompress, $compressedThisMonth);
+            $price = number_format((float)$price, 2, '.', '');
 
             $this->printPriceMessage($toCompress, $compressedThisMonth, $price);
             return;

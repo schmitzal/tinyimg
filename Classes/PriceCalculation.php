@@ -54,7 +54,6 @@ class PriceCalculation
         $price = $this->calculatePrice($compressedUntilNow + $toCompress) - $this->calculatePrice($compressedUntilNow);
 
         $price = round($price, 2);
-        $price = number_format((float)$price, 2, '.', '');
 
         return $price;
     }
