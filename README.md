@@ -8,7 +8,7 @@ This API can reduce up to 80% of the file size of your images, which will increa
 
 ## Installation via composer
 1. Get extension tinyimg: `composer require schmitzal/tinyimg`
-2. Active extension (using extension manager or commandline)
+2. Activate extension (using extension manager or commandline)
 
 #### _Installation via extension manager_
 Installing the extension via extension manager is possible but as tinyimg requires the [tinify/tinify](https://packagist.org/packages/tinify/tinify) library you will have to take care of installing this package manually.
@@ -28,6 +28,8 @@ This extension contains an extbase command which runs through all files storages
 Make sure to have an updated index. TYPO3 comes with an index updater as a scheduler task called "File Abstraction Layer: Update storage index (scheduler)".
 
 Also be aware that the tinify API is limited to 500 free compressions (see note above). So on huge websites it will be reached quickly.
+
+To calculate estimated costs for the compression, run the command with the `--countFiles` option first.
 
 ## Contribution
 Bugs and feature requests are welcome. Feel free to create an [issue](https://github.com/schmitzal/tinyimg/issues) and i'll have a look at it as soon as possible.

@@ -106,6 +106,20 @@ class CompressImageService
         $this->updateFileInformation($file);
     }
 
+    public function getCompressionsThisMonthCount()
+    {
+        $this->initAction();
+        try {
+            \Tinify\setKey($this->getApiKey());
+            \Tinify\validate();
+        } catch (\Tinify\Exception $e) {
+            return false;
+        }
+        $compressionsThisMonth = \Tinify\compressionCount();
+
+        return $compressionsThisMonth;
+    }
+
     /**
      * Check if the aus driver extension exists and is loaded.
      * Additionally it checks if CDN is actually set and
@@ -117,8 +131,8 @@ class CompressImageService
     public function checkForAmazonCdn($file)
     {
         return ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3') &&
-        $this->getUseCdn() &&
-        $this->checkIfFolderIsCdn($file);
+            $this->getUseCdn() &&
+            $this->checkIfFolderIsCdn($file);
     }
 
     /**
