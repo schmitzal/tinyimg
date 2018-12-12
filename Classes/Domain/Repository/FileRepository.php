@@ -38,7 +38,10 @@ class FileRepository extends Repository
                 $query->in('extension', ['png', 'jpg', 'jpeg'])
             ])
         );
-        $query->setLimit($limit);
+        // Do not use any limit, if a negative limit was passed
+        if ($limit >= 0) {
+            $query->setLimit($limit);
+        }
 
         return $query->execute();
     }

@@ -2,6 +2,7 @@
 namespace Schmitzal\Tinyimg\Command;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
+use Schmitzal\Tinyimg\PriceCalculation;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -37,6 +38,7 @@ class CompressImagesCommandController extends CommandController
 
     /**
      * Command: compress
+     * @param bool $countFiles
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      * @throws \TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException
      * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
@@ -44,8 +46,18 @@ class CompressImagesCommandController extends CommandController
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\InvalidQueryException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
      */
-    public function compressCommand()
+    public function compressCommand($countFiles = false)
     {
+        if ($countFiles) {
+            $toCompress = $this->countFiles();
+            $compressedThisMonth = $this->compressImageService->getCompressionsThisMonthCount();
+            $priceCalculation = new PriceCalculation();
+            $price = $priceCalculation->calculateCosts($toCompress, $compressedThisMonth);
+
+            $this->printPriceMessage($toCompress, $compressedThisMonth, $price);
+            return;
+        }
+
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
             $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 100);
@@ -55,6 +67,38 @@ class CompressImagesCommandController extends CommandController
             $this->clearProcessedFiles();
         }
     }
+
+    private function countFiles()
+    {
+        $count = 0;
+        foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
+            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, -1)->count();
+            $count += $files;
+        }
+
+        return $count;
+    }
+
+    private function printPriceMessage($toCompress, $compressed, $price)
+    {
+        $table = [
+            [
+                "Files compressed this month:",
+                $compressed,
+            ],
+            [
+                "Files to compress:",
+                $toCompress,
+            ],
+            [
+                "Price:",
+                $price . " USD",
+            ],
+        ];
+        $this->output->outputTable($table);
+    }
+
+
 
     /**
      * @param QueryResultInterface $files
