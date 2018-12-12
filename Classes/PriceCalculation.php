@@ -4,7 +4,6 @@ namespace Schmitzal\Tinyimg;
 
 class PriceCalculation
 {
-    private $compressionUtil;
     private const PRICE_PER_IMAGE = [
         [
             "imageCount" => 10000,
@@ -36,7 +35,10 @@ class PriceCalculation
             }
         }
 
-        $totalPrice = $this->calculatePrice($barrier["imageCount"]) + ($fileCount - $barrier["imageCount"]) * $barrier["pricePerImage"];
+        $totalPrice = 0;
+        if (!empty($barrier)) {
+            $totalPrice = $this->calculatePrice($barrier["imageCount"]) + ($fileCount - $barrier["imageCount"]) * $barrier["pricePerImage"];
+        }
 
         return $totalPrice;
     }
