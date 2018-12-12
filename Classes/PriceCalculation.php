@@ -20,6 +20,7 @@ class PriceCalculation
      * Calculates price of compression run, given no compression were made in current month
      *
      * @param  $fileCount
+     *
      * @return float|int
      */
     private function calculatePrice($fileCount)
@@ -35,21 +36,22 @@ class PriceCalculation
             }
         }
 
-        $totalPrice = $this->calculatePrice($barrier["imageCount"]) + ($fileCount-$barrier["imageCount"]) * $barrier["pricePerImage"];
+        $totalPrice = $this->calculatePrice($barrier["imageCount"]) + ($fileCount - $barrier["imageCount"]) * $barrier["pricePerImage"];
 
         return $totalPrice;
     }
 
     /**
-     * Calculates price of compression run in USD and EUR.
+     * Calculates price of compression run in USD.
      *
      * @param  $toCompress
      * @param  $compressedUntilNow
-     * @return array
+     *
+     * @return float
      */
     public function calculateCosts($toCompress, $compressedUntilNow)
     {
-        $price = $this->calculatePrice($compressedUntilNow+$toCompress) - $this->calculatePrice($compressedUntilNow);
+        $price = $this->calculatePrice($compressedUntilNow + $toCompress) - $this->calculatePrice($compressedUntilNow);
 
         $price = round($price, 2);
         $price = number_format((float)$price, 2, '.', '');
