@@ -55,7 +55,7 @@ class CompressImageService
      */
     public function initAction()
     {
-        $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyimg']);
+        $this->extConf = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyimg'];
 
         if (ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3')) {
             $this->initCdn();
