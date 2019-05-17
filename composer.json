@@ -16,11 +16,11 @@
             "role": "Developer",
             "homepage": "https://www.interlutions.de/"
         },
-		{
-			"name": "b13 GmbH",
-			"role": "typo3@b13.com",
-			"homepage": "https://b13.com/"
-		}
+        {
+            "name": "b13 GmbH",
+            "role": "typo3@b13.com",
+            "homepage": "https://b13.com/"
+        }
     ],
     "support": {
         "issues": "https://github.com/schmitzal/tinyimg/issues"
