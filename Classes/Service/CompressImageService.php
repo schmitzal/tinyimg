@@ -259,7 +259,7 @@ class CompressImageService
         /** @var ConfigurationManager $configurationManager */
         $configurationManager = $this->objectManager->get(ConfigurationManager::class);
 
-        return $configurationManager->getConfiguration(
+        return (array)$configurationManager->getConfiguration(
             ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
             'tinyimg'
         );
@@ -297,6 +297,18 @@ class CompressImageService
         }
     }
 
+    /**
+     * @return bool
+     */
+    protected function isCli(): bool
+    {
+        if (version_compare(TYPO3_version, '9', '>')) {
+            return Environment::isCli();
+        } else {
+            return php_sapi_name() === 'cli';
+        }
+    }
+
 
     /**
      * @param string $key
@@ -306,7 +318,7 @@ class CompressImageService
      */
     protected function addMessageToFlashMessageQueue(string $key, array $replaceMarkers = [], int $severity = FlashMessage::ERROR): void
     {
-        if (Environment::isCli()) {
+        if ($this->isCli()) {
             return;
         }
 
