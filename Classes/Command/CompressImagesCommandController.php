@@ -7,6 +7,8 @@ use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 
 /**
  * Class CompressImagesCommandController
@@ -46,14 +48,17 @@ class CompressImagesCommandController extends CommandController
      */
     public function compressCommand()
     {
+        $settings = $this->getTypoScriptConfiguration();
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
-            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 100);
+            $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['exludeFolders'], true);
+            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 100, $excludeFolders);
 
             $this->compressImages($files);
 
             $this->clearProcessedFiles();
         }
+
     }
 
     /**
@@ -90,5 +95,20 @@ class CompressImagesCommandController extends CommandController
 
         $repository->removeAll();
         $cacheManager->flushCachesInGroup('pages');
+    }
+
+    /**
+     * @return array
+     * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
+     */
+    protected function getTypoScriptConfiguration(): array
+    {
+        /** @var ConfigurationManager $configurationManager */
+        $configurationManager = $this->objectManager->get(ConfigurationManager::class);
+
+        return (array)$configurationManager->getConfiguration(
+            ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
+            'tinyimg'
+        );
     }
 }

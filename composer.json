@@ -15,6 +15,11 @@
             "name": "Alessandro Schmitz",
             "role": "Developer",
             "homepage": "https://www.interlutions.de/"
+        },
+        {
+            "name": "b13 GmbH",
+            "role": "typo3@b13.com",
+            "homepage": "https://b13.com/"
         }
     ],
     "support": {
