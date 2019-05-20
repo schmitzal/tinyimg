@@ -6,6 +6,21 @@
 			<trans-unit id="compressingLabel">
                 <source>Image is getting compressed...</source>
             </trans-unit>
+			<trans-unit id="flashMessage.message.folderExcluded">
+				<source>Folder excluded from compression ("%s")</source>
+			</trans-unit>
+			<trans-unit id="flashMessage.message.debugMode">
+				<source>running in debugMode, no compression</source>
+			</trans-unit>
+			<trans-unit id="flashMessage.message.compressionFailed">
+				<source>compression failed with message "%s"</source>
+			</trans-unit>
+			<trans-unit id="flashMessage.message.success">
+				<source>Tinyimg saved you about %s of your file size!</source>
+			</trans-unit>
+			<trans-unit id="flashMessage.title">
+				<source>Compression</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
