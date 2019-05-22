@@ -1,4 +1,5 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Domain\Repository;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
@@ -33,7 +34,7 @@ class FileRepository extends Repository
         $query = $this->createQuery();
 
         $excludeFoldersConstraints = [];
-        foreach($excludeFolders as $excludeFolder) {
+        foreach ($excludeFolders as $excludeFolder) {
             $excludeFoldersConstraints[] = $query->logicalNot($query->like('identifier', $excludeFolder . '%'));
         }
 
@@ -41,10 +42,10 @@ class FileRepository extends Repository
             $query->logicalAnd(
                 array_merge(
                     [
-                    $query->equals('storage', $storage),
-                    $query->equals('compressed', false),
-                    $query->equals('missing', false),
-                    $query->in('extension', ['png', 'jpg', 'jpeg'])
+                        $query->equals('storage', $storage),
+                        $query->equals('compressed', false),
+                        $query->equals('missing', false),
+                        $query->in('extension', ['png', 'jpg', 'jpeg'])
                     ],
                     $excludeFoldersConstraints
                 )

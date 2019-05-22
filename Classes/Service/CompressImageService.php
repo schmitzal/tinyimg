@@ -1,4 +1,5 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Service;
 
 use Aws\S3\Exception\S3Exception;
@@ -100,7 +101,7 @@ class CompressImageService
         $this->initAction();
 
         if ($this->isFileInExcludeFolder($file)) {
-           return;
+            return;
         }
 
         if (!in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
@@ -117,7 +118,6 @@ class CompressImageService
                     $source = \Tinify\fromFile($publicUrl);
                     $source->toFile($publicUrl);
                     $fileSize = $this->setCompressedForCurrentFile($file);
-
                 }
                 if ((int)$fileSize !== 0) {
                     $percentageSaved = (int)(100 - ((100 / $originalFileSize) * $fileSize));
@@ -137,7 +137,7 @@ class CompressImageService
      * @param File $file
      * @return bool
      */
-    protected function isFileInExcludeFolder(File $file): bool
+    protected function isFileInExcludeFolder(File $file)
     {
         if (!empty($this->settings['exludeFolders'])) {
             $exludeFolders = GeneralUtility::trimExplode(',', $this->settings['exludeFolders'], true);
@@ -160,11 +160,11 @@ class CompressImageService
      * @param File $file
      * @return bool
      */
-    public function checkForAmazonCdn(File $file): bool
+    public function checkForAmazonCdn(File $file)
     {
         return ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3') &&
-        $this->getUseCdn() &&
-        $this->checkIfFolderIsCdn($file);
+            $this->getUseCdn() &&
+            $this->checkIfFolderIsCdn($file);
     }
 
     /**
@@ -178,14 +178,14 @@ class CompressImageService
      * @return int
      * @throws \Exception
      */
-    public function pushToTinyPngAndStoreToCdn(File $file): ?int
+    public function pushToTinyPngAndStoreToCdn(File $file)
     {
         // get the image
         // no PATH_site as file will be provided by absolute URL of the bucket or the CDN
         $publicUrl = $file->getPublicUrl();
 
         // get the temp file and prefix with current time
-        $tempFile = PATH_site . 'typo3temp' . DIRECTORY_SEPARATOR . time() .'_'.  $this->getCdnFileName($publicUrl);
+        $tempFile = PATH_site . 'typo3temp' . DIRECTORY_SEPARATOR . time() . '_' . $this->getCdnFileName($publicUrl);
 
         $source = \Tinify\fromFile($publicUrl);
 
@@ -211,7 +211,7 @@ class CompressImageService
      * @param File $file
      * @return boolean
      */
-    public function checkIfFolderIsCdn($file): bool
+    public function checkIfFolderIsCdn($file)
     {
         // if this is string, then we know, that there is already a file in the folder
         // In this case you have to check if the object in the bucket exists
@@ -229,7 +229,7 @@ class CompressImageService
      * @param string $fileName
      * @return string
      */
-    public function getCdnFileName(string $fileName): string
+    public function getCdnFileName(string $fileName)
     {
         return preg_replace('/^.*\/(.*)$/', '$1', $fileName);
     }
@@ -237,7 +237,7 @@ class CompressImageService
     /**
      * @return string
      */
-    protected function getApiKey(): string
+    protected function getApiKey()
     {
         return (string)$this->extConf['apiKey'];
     }
@@ -245,7 +245,7 @@ class CompressImageService
     /**
      * @return boolean
      */
-    protected function getUseCdn(): bool
+    protected function getUseCdn()
     {
         return (bool)$this->extConf['useCdn'];
     }
@@ -254,7 +254,7 @@ class CompressImageService
      * @return array
      * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
      */
-    protected function getTypoScriptConfiguration(): array
+    protected function getTypoScriptConfiguration()
     {
         /** @var ConfigurationManager $configurationManager */
         $configurationManager = $this->objectManager->get(ConfigurationManager::class);
@@ -268,7 +268,7 @@ class CompressImageService
     /**
      * @param File $file
      */
-    protected function updateFileInformation(File $file): void
+    protected function updateFileInformation(File $file)
     {
         /** @var Indexer $fileIndexer */
         $fileIndexer = $this->objectManager->get(Indexer::class, $file->getStorage());
@@ -281,7 +281,7 @@ class CompressImageService
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
      * @return int
      */
-    protected function setCompressedForCurrentFile(File $file): ?int
+    protected function setCompressedForCurrentFile(File $file)
     {
         /** @var \Schmitzal\Tinyimg\Domain\Model\File $extbaseFileObject */
         $extbaseFileObject = $this->fileRepository->findByUid($file->getUid());
@@ -300,7 +300,7 @@ class CompressImageService
     /**
      * @return bool
      */
-    protected function isCli(): bool
+    protected function isCli()
     {
         if (version_compare(TYPO3_version, '9', '>')) {
             return Environment::isCli();
@@ -316,7 +316,7 @@ class CompressImageService
      * @param int $severity
      * @throws \TYPO3\CMS\Core\Exception
      */
-    protected function addMessageToFlashMessageQueue(string $key, array $replaceMarkers = [], int $severity = FlashMessage::ERROR): void
+    protected function addMessageToFlashMessageQueue($key, array $replaceMarkers = [], $severity = FlashMessage::ERROR)
     {
         if ($this->isCli()) {
             return;
@@ -340,5 +340,4 @@ class CompressImageService
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
     }
-
 }
