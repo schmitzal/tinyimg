@@ -1,4 +1,5 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Service;
 
 use Aws\S3\Exception\S3Exception;
@@ -100,7 +101,7 @@ class CompressImageService
         $this->initAction();
 
         if ($this->isFileInExcludeFolder($file)) {
-           return;
+            return;
         }
 
         if (!in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
@@ -163,8 +164,8 @@ class CompressImageService
     public function checkForAmazonCdn(File $file)
     {
         return ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3') &&
-        $this->getUseCdn() &&
-        $this->checkIfFolderIsCdn($file);
+            $this->getUseCdn() &&
+            $this->checkIfFolderIsCdn($file);
     }
 
     /**
@@ -185,7 +186,7 @@ class CompressImageService
         $publicUrl = $file->getPublicUrl();
 
         // get the temp file and prefix with current time
-        $tempFile = PATH_site . 'typo3temp' . DIRECTORY_SEPARATOR . time() .'_'.  $this->getCdnFileName($publicUrl);
+        $tempFile = PATH_site . 'typo3temp' . DIRECTORY_SEPARATOR . time() . '_' . $this->getCdnFileName($publicUrl);
 
         $source = \Tinify\fromFile($publicUrl);
 
@@ -340,5 +341,4 @@ class CompressImageService
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
     }
-
 }

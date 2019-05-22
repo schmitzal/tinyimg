@@ -1,4 +1,5 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Command;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
@@ -58,7 +59,6 @@ class CompressImagesCommandController extends CommandController
 
             $this->clearProcessedFiles();
         }
-
     }
 
     /**
