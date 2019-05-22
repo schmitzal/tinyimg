@@ -118,7 +118,6 @@ class CompressImageService
                     $source = \Tinify\fromFile($publicUrl);
                     $source->toFile($publicUrl);
                     $fileSize = $this->setCompressedForCurrentFile($file);
-
                 }
                 if ((int)$fileSize !== 0) {
                     $percentageSaved = (int)(100 - ((100 / $originalFileSize) * $fileSize));
