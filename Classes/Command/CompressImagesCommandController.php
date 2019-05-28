@@ -4,7 +4,7 @@ namespace Schmitzal\Tinyimg\Command;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
 use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
+use TYPO3\CMS\Core\Resource\Processing\FileDeletionAspect;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
@@ -57,7 +57,7 @@ class CompressImagesCommandController extends CommandController
 
             $this->compressImages($files);
 
-            $this->clearProcessedFiles();
+            $this->clearProcessedFiles($files);
         }
 
     }
@@ -87,14 +87,15 @@ class CompressImagesCommandController extends CommandController
      * Remove all processed files, so they get generated again after being compressed
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      */
-    protected function clearProcessedFiles()
+    protected function clearProcessedFiles($files)
     {
-        /** @var ProcessedFileRepository $repository */
-        $repository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
+        /** @var FileDeletionAspect $fileDeletionAspect */
+        $fileDeletionAspect = GeneralUtility::makeInstance(FileDeletionAspect::class);
         /** @var CacheManager $cacheManager */
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-
-        $repository->removeAll();
+        foreach ($files as $file) {
+            $fileDeletionAspect->cleanupProcessedFilesPostFileReplace($file, '');
+        }
         $cacheManager->flushCachesInGroup('pages');
     }
 
