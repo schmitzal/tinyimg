@@ -53,13 +53,12 @@ class CompressImagesCommandController extends CommandController
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
             $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['exludeFolders'], true);
-            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 1, $excludeFolders);
+            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 100, $excludeFolders);
 
             $this->compressImages($files);
 
             $this->clearPageCache();
         }
-
     }
 
     /**
