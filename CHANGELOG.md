@@ -1,5 +1,8 @@
 # Changelog
 
+### 1.4.0
+* **[FEATURE]** Add option to exclude specific folders from compression - Thanks to @achimfritz, @davidsteeb and @bmack from @b13 GmbH
+
 ### 1.3.0
 * **[FEATURE]** Add support for TYPO3 9.5
 * **[CHANGE]** Drop support of non composer installation
