@@ -4,7 +4,7 @@ namespace Schmitzal\Tinyimg\Command;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
 use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
+use TYPO3\CMS\Core\Resource\Processing\FileDeletionAspect;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
@@ -57,7 +57,7 @@ class CompressImagesCommandController extends CommandController
 
             $this->compressImages($files);
 
-            $this->clearProcessedFiles();
+            $this->clearPageCache();
         }
     }
 
@@ -71,12 +71,15 @@ class CompressImagesCommandController extends CommandController
      */
     protected function compressImages(QueryResultInterface $files)
     {
+        /** @var FileDeletionAspect $fileDeletionAspect */
+        $fileDeletionAspect = GeneralUtility::makeInstance(FileDeletionAspect::class);
         /** @var \Schmitzal\Tinyimg\Domain\Model\File $file */
         foreach ($files as $file) {
             if ($file instanceof \Schmitzal\Tinyimg\Domain\Model\File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
                 if (filesize(GeneralUtility::getFileAbsFileName($file->getPublicUrl())) > 0) {
                     $this->compressImageService->initializeCompression($file);
+                    $fileDeletionAspect->cleanupProcessedFilesPostFileReplace($file, '');
                 }
             }
         }
@@ -86,14 +89,10 @@ class CompressImagesCommandController extends CommandController
      * Remove all processed files, so they get generated again after being compressed
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      */
-    protected function clearProcessedFiles()
+    protected function clearPageCache()
     {
-        /** @var ProcessedFileRepository $repository */
-        $repository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
         /** @var CacheManager $cacheManager */
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-
-        $repository->removeAll();
         $cacheManager->flushCachesInGroup('pages');
     }
 
