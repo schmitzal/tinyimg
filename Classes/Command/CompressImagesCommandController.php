@@ -1,4 +1,5 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Command;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
