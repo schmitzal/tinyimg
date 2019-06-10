@@ -52,7 +52,7 @@ class CompressImagesCommandController extends CommandController
         $settings = $this->getTypoScriptConfiguration();
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
-            $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['exludeFolders'], true);
+            $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['excludeFolders'], true);
             $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 100, $excludeFolders);
 
             $this->compressImages($files);
