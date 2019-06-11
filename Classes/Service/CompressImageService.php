@@ -139,12 +139,12 @@ class CompressImageService
      */
     protected function isFileInExcludeFolder(File $file)
     {
-        if (!empty($this->settings['exludeFolders'])) {
-            $exludeFolders = GeneralUtility::trimExplode(',', $this->settings['exludeFolders'], true);
+        if (!empty($this->settings['excludeFolders'])) {
+            $excludeFolders = GeneralUtility::trimExplode(',', $this->settings['excludeFolders'], true);
             $identifier = $file->getIdentifier();
-            foreach ($exludeFolders as $exludeFolder) {
-                if (strpos($identifier, $exludeFolder) === 0) {
-                    $this->addMessageToFlashMessageQueue('folderExcluded', [0 => $exludeFolder], FlashMessage::INFO);
+            foreach ($excludeFolders as $excludeFolder) {
+                if (strpos($identifier, $excludeFolder) === 0) {
+                    $this->addMessageToFlashMessageQueue('folderExcluded', [0 => $excludeFolder], FlashMessage::INFO);
                     return true;
                 }
             }
