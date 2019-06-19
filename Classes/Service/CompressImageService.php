@@ -104,7 +104,7 @@ class CompressImageService
             return;
         }
 
-        if (!in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
+        if (!in_array(strtolower($file->getMimeType()), ['image/png', 'image/jpeg'], true)) {
             return;
         }
 
