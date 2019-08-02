@@ -21,7 +21,7 @@
         "issues": "https://github.com/schmitzal/tinyimg/issues"
     },
     "require": {
-        "typo3/cms-core": "^7.6.0 || ^8.7.0 || ^9.5.0",
+        "typo3/cms-core": " ^8.7.0 || ^9.5.0 || ^10.0",
         "tinify/tinify": "^1.5"
     },
     "require-dev": {
