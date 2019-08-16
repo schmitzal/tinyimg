@@ -114,7 +114,7 @@ class CompressImageService
                 if ($this->checkForAmazonCdn($file)) {
                     $fileSize = $this->pushToTinyPngAndStoreToCdn($file);
                 } else {
-                    $publicUrl = PATH_site . $file->getPublicUrl();
+                    $publicUrl = PATH_site . urldecode($file->getPublicUrl());
                     $source = \Tinify\fromFile($publicUrl);
                     $source->toFile($publicUrl);
                     $fileSize = $this->setCompressedForCurrentFile($file);
