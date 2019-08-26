@@ -1,6 +1,6 @@
 module.tx_tinyimg.settings {
   debug = 0
-  exludeFolders =
+  excludeFolders =
 }
 
 [applicationContext = Development*]

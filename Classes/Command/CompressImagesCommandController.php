@@ -52,7 +52,7 @@ class CompressImagesCommandController extends CommandController
         $settings = $this->getTypoScriptConfiguration();
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
-            $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['exludeFolders'], true);
+            $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['excludeFolders'], true);
             $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 100, $excludeFolders);
 
             $this->compressImages($files);
@@ -77,7 +77,7 @@ class CompressImagesCommandController extends CommandController
         foreach ($files as $file) {
             if ($file instanceof \Schmitzal\Tinyimg\Domain\Model\File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
-                if (filesize(GeneralUtility::getFileAbsFileName($file->getPublicUrl())) > 0) {
+                if (@filesize(GeneralUtility::getFileAbsFileName(urldecode($file->getPublicUrl()))) > 0) {
                     $this->compressImageService->initializeCompression($file);
                     $fileDeletionAspect->cleanupProcessedFilesPostFileReplace($file, '');
                 }

@@ -104,7 +104,7 @@ class CompressImageService
             return;
         }
 
-        if (!in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
+        if (!in_array(strtolower($file->getMimeType()), ['image/png', 'image/jpeg'], true)) {
             return;
         }
 
@@ -114,7 +114,7 @@ class CompressImageService
                 if ($this->checkForAmazonCdn($file)) {
                     $fileSize = $this->pushToTinyPngAndStoreToCdn($file);
                 } else {
-                    $publicUrl = PATH_site . $file->getPublicUrl();
+                    $publicUrl = PATH_site . urldecode($file->getPublicUrl());
                     $source = \Tinify\fromFile($publicUrl);
                     $source->toFile($publicUrl);
                     $fileSize = $this->setCompressedForCurrentFile($file);
@@ -139,12 +139,12 @@ class CompressImageService
      */
     protected function isFileInExcludeFolder(File $file)
     {
-        if (!empty($this->settings['exludeFolders'])) {
-            $exludeFolders = GeneralUtility::trimExplode(',', $this->settings['exludeFolders'], true);
+        if (!empty($this->settings['excludeFolders'])) {
+            $excludeFolders = GeneralUtility::trimExplode(',', $this->settings['excludeFolders'], true);
             $identifier = $file->getIdentifier();
-            foreach ($exludeFolders as $exludeFolder) {
-                if (strpos($identifier, $exludeFolder) === 0) {
-                    $this->addMessageToFlashMessageQueue('folderExcluded', [0 => $exludeFolder], FlashMessage::INFO);
+            foreach ($excludeFolders as $excludeFolder) {
+                if (strpos($identifier, $excludeFolder) === 0) {
+                    $this->addMessageToFlashMessageQueue('folderExcluded', [0 => $excludeFolder], FlashMessage::INFO);
                     return true;
                 }
             }
