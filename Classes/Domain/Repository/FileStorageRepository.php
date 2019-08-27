@@ -2,6 +2,7 @@
 namespace Schmitzal\Tinyimg\Domain\Repository;
 
 use TYPO3\CMS\Extbase\Persistence\Repository;
+use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 
 /**
  * Class FileStorageRepository
@@ -12,7 +13,7 @@ class FileStorageRepository extends Repository
     /**
      * Do not respect storage pid for domain records
      */
-    public function createQuery()
+    public function createQuery(): QueryInterface
     {
         $query = parent::createQuery();
         $query->getQuerySettings()->setRespectStoragePage(false);

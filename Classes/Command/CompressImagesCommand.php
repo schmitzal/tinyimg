@@ -13,6 +13,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputArgument;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
@@ -24,6 +25,9 @@ use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
  */
 class CompressImagesCommand extends Command
 {
+
+    const DEFAULT_LIMIT_TO_PROCESS = 100;
+
     /**
      * @var \Schmitzal\Tinyimg\Domain\Repository\FileStorageRepository
      */
@@ -54,9 +58,14 @@ class CompressImagesCommand extends Command
      */
     protected function configure(): void
     {
-        $this
-            ->setName('compressImages:compress')
-            ->setDescription('compress uncompressed images');
+        $this->setName('compressImages:compress')
+            ->setDescription('compress uncompressed images')
+            ->addArgument(
+                'limit',
+                InputArgument::OPTIONAL,
+                'limit of files to compress',
+                self::DEFAULT_LIMIT_TO_PROCESS
+            );
     }
 
     /**
@@ -79,12 +88,13 @@ class CompressImagesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        $limit = (int)$input->getArgument('limit');
         $this->initializeDependencies();
         $settings = $this->getTypoScriptConfiguration();
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
             $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['excludeFolders'], true);
-            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 100, $excludeFolders);
+            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, $limit, $excludeFolders);
             $this->compressImages($files);
             $this->clearPageCache();
         }
