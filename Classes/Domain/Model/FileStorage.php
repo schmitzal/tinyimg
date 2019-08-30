@@ -41,7 +41,7 @@ class FileStorage extends AbstractEntity
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -49,7 +49,7 @@ class FileStorage extends AbstractEntity
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -57,7 +57,7 @@ class FileStorage extends AbstractEntity
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -65,7 +65,7 @@ class FileStorage extends AbstractEntity
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
     }
@@ -73,7 +73,7 @@ class FileStorage extends AbstractEntity
     /**
      * @return bool
      */
-    public function isDefault()
+    public function isDefault(): bool
     {
         return $this->default;
     }
@@ -81,7 +81,7 @@ class FileStorage extends AbstractEntity
     /**
      * @param bool $default
      */
-    public function setDefault($default)
+    public function setDefault(bool $default)
     {
         $this->default = $default;
     }
@@ -89,7 +89,7 @@ class FileStorage extends AbstractEntity
     /**
      * @return bool
      */
-    public function isBrowsable()
+    public function isBrowsable(): bool
     {
         return $this->browsable;
     }
@@ -97,7 +97,7 @@ class FileStorage extends AbstractEntity
     /**
      * @param bool $browsable
      */
-    public function setBrowsable($browsable)
+    public function setBrowsable(bool $browsable)
     {
         $this->browsable = $browsable;
     }
@@ -105,7 +105,7 @@ class FileStorage extends AbstractEntity
     /**
      * @return bool
      */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->public;
     }
@@ -113,7 +113,7 @@ class FileStorage extends AbstractEntity
     /**
      * @param bool $public
      */
-    public function setPublic($public)
+    public function setPublic(bool $public)
     {
         $this->public = $public;
     }
@@ -121,7 +121,7 @@ class FileStorage extends AbstractEntity
     /**
      * @return bool
      */
-    public function isWritable()
+    public function isWritable(): bool
     {
         return $this->writable;
     }
@@ -129,7 +129,7 @@ class FileStorage extends AbstractEntity
     /**
      * @param bool $writable
      */
-    public function setWritable($writable)
+    public function setWritable(bool $writable)
     {
         $this->writable = $writable;
     }
@@ -137,7 +137,7 @@ class FileStorage extends AbstractEntity
     /**
      * @return bool
      */
-    public function isOnline()
+    public function isOnline(): bool
     {
         return $this->online;
     }
@@ -145,7 +145,7 @@ class FileStorage extends AbstractEntity
     /**
      * @param bool $online
      */
-    public function setOnline($online)
+    public function setOnline(bool $online)
     {
         $this->online = $online;
     }
