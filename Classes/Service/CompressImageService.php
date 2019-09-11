@@ -7,6 +7,7 @@ use Aws\S3\S3Client;
 
 use Schmitzal\Tinyimg\Domain\Repository\FileRepository;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -164,6 +165,7 @@ class CompressImageService
                     $this->addMessageToFlashMessageQueue('success', [0 => (string)$percentageSaved . '%'], FlashMessage::INFO);
                 }
             } catch (\Exception $e) {
+                $this->excludeFile($file, $e);
                 $this->addMessageToFlashMessageQueue('compressionFailed', [0 => $e->getMessage()], FlashMessage::WARNING);
             }
         } else {
@@ -381,5 +383,25 @@ class CompressImageService
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
+    }
+
+    /**
+     * Function to write error log and set compressed to 2 if compression failed. The file will no longer be compressed
+     * again until compressed is set ot 0 once again.
+     *
+     * @param File §file
+     * @param string $errorMessage
+     */
+    protected function excludeFile($file, $errorMessage)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ConnectionPool::class)->getQueryBuilderForTable('sys_file');
+        $queryBuilder
+            ->update('sys_file')
+            ->set('compressed', 2)
+            ->set('compress_log', $errorMessage)
+            ->where(
+                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($file->getUid()))
+            )
+            ->execute();
     }
 }
