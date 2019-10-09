@@ -3,10 +3,18 @@
 namespace Schmitzal\Tinyimg\Command;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
+use Schmitzal\Tinyimg\Domain\Repository\FileRepository;
+use Schmitzal\Tinyimg\Domain\Repository\FileStorageRepository;
+use Schmitzal\Tinyimg\Service\CompressImageService;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Resource\Processing\FileDeletionAspect;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -15,48 +23,79 @@ use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
  * Class CompressImagesCommandController
  * @package Schmitzal\Tinyimg\Command
  */
-class CompressImagesCommandController extends CommandController
+class CompressImagesCommand extends Command
 {
+
+    const DEFAULT_LIMIT_TO_PROCESS = 100;
+
     /**
      * @var \Schmitzal\Tinyimg\Domain\Repository\FileStorageRepository
-     * @inject
      */
     protected $fileStorageRepository;
+
     /**
      * @var \Schmitzal\Tinyimg\Domain\Repository\FileRepository
-     * @inject
      */
     protected $fileRepository;
+
     /**
      * @var \TYPO3\CMS\Core\Resource\ResourceFactory
-     * @inject
      */
     protected $resourceFactory;
+
     /**
      * @var \Schmitzal\Tinyimg\Service\CompressImageService
-     * @inject
      */
     protected $compressImageService;
 
     /**
-     * Command: compress
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
-     * @throws \TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException
-     * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\InvalidQueryException
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
+     * @var ObjectManager
      */
-    public function compressCommand()
+    protected $objectManager;
+
+    /**
+     * @return void
+     */
+    protected function configure(): void
     {
+        $this->setName('compressImages:compress')
+            ->setDescription('compress uncompressed images')
+            ->addArgument(
+                'limit',
+                InputArgument::OPTIONAL,
+                'limit of files to compress',
+                self::DEFAULT_LIMIT_TO_PROCESS
+            );
+    }
+
+    /**
+     * @throws \TYPO3\CMS\Extbase\Object\Exception
+     */
+    protected function initializeDependencies(): void
+    {
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->fileStorageRepository = $this->objectManager->get(FileStorageRepository::class);
+        $this->fileRepository = $this->objectManager->get(FileRepository::class);
+        $this->resourceFactory = $this->objectManager->get(ResourceFactory::class);
+        $this->compressImageService = $this->objectManager->get(CompressImageService::class);
+    }
+
+    /**
+     * Executes the command for adding the lock file
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): void
+    {
+        $limit = (int)$input->getArgument('limit');
+        $this->initializeDependencies();
         $settings = $this->getTypoScriptConfiguration();
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
-            $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['exludeFolders'], true);
-            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, 100, $excludeFolders);
-
+            $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['excludeFolders'], true);
+            $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, $limit, $excludeFolders);
             $this->compressImages($files);
-
             $this->clearPageCache();
         }
     }
@@ -69,7 +108,7 @@ class CompressImagesCommandController extends CommandController
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
      */
-    protected function compressImages(QueryResultInterface $files)
+    protected function compressImages(QueryResultInterface $files): void
     {
         /** @var FileDeletionAspect $fileDeletionAspect */
         $fileDeletionAspect = GeneralUtility::makeInstance(FileDeletionAspect::class);
@@ -77,7 +116,7 @@ class CompressImagesCommandController extends CommandController
         foreach ($files as $file) {
             if ($file instanceof \Schmitzal\Tinyimg\Domain\Model\File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
-                if (filesize(GeneralUtility::getFileAbsFileName($file->getPublicUrl())) > 0) {
+                if (@filesize(GeneralUtility::getFileAbsFileName(urldecode($file->getPublicUrl()))) > 0) {
                     $this->compressImageService->initializeCompression($file);
                     $fileDeletionAspect->cleanupProcessedFilesPostFileReplace($file, '');
                 }
@@ -89,7 +128,7 @@ class CompressImagesCommandController extends CommandController
      * Remove all processed files, so they get generated again after being compressed
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      */
-    protected function clearPageCache()
+    protected function clearPageCache(): void
     {
         /** @var CacheManager $cacheManager */
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
