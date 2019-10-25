@@ -165,7 +165,7 @@ class CompressImageService
                     $this->addMessageToFlashMessageQueue('success', [0 => (string)$percentageSaved . '%'], FlashMessage::INFO);
                 }
             } catch (\Exception $e) {
-                $this->excludeFile($file, $e);
+                $this->saveError($file, $e);
                 $this->addMessageToFlashMessageQueue('compressionFailed', [0 => $e->getMessage()], FlashMessage::WARNING);
             }
         } else {
@@ -386,22 +386,17 @@ class CompressImageService
     }
 
     /**
-     * Function to write error log and set compressed to 2 if compression failed. The file will no longer be compressed
-     * again until compressed is set ot 0 once again.
-     *
-     * @param File §file
-     * @param string $errorMessage
+     * @param File $file
+     * @param \Exception $e
      */
-    protected function excludeFile($file, $errorMessage)
+    protected function saveError(File $file, \Exception $e)
     {
-        $queryBuilder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-        $queryBuilder
-            ->update('sys_file')
-            ->set('compressed', 2)
-            ->set('compress_log', $errorMessage)
-            ->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($file->getUid()))
-            )
-            ->execute();
+        $connection = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ConnectionPool::class)->getConnectionForTable('sys_file');
+        $connection->update(
+            'sys_file',
+            ['compress_error' => $e->getCode() . ' : ' . $e->getMessage()],
+            ['uid' => (int)$file->getUid()]
+        );
+
     }
 }

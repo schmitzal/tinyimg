@@ -47,6 +47,7 @@ class FileRepository extends Repository
                         $query->equals('storage', $storage),
                         $query->equals('compressed', false),
                         $query->equals('missing', false),
+                        $query->equals('compress_error', ''),
                         $query->in('mime_type', ['image/png', 'image/jpeg'])
                     ],
                     $excludeFoldersConstraints

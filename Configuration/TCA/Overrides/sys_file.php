@@ -3,18 +3,13 @@
 $sysFileColumns = [
     'compressed' => [
         'exclude' => true,
-        'label' => 'Compression Status',
+        'label' => 'Compressed',
         'config' => [
-            'type' => 'select',
-            'default' => 0,
-            'items' => [
-                ['Not compressed', 0],
-                ['Compressed', 1],
-                ['Excluded from compressing process due to error', 2]
-            ],
-        ],
+            'type' => 'check',
+            'default' => 0
+        ]
     ],
-    'compress_log' => [
+    'compress_error' => [
         'exclude' => true,
         'label' => 'Compression Error',
         'config' => [
@@ -25,6 +20,6 @@ $sysFileColumns = [
 ];
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('sys_file', $sysFileColumns);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('sys_file', 'compress_log', '', '');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('sys_file', 'compress_error', '', '');
 
-$GLOBALS['TCA']['sys_file']['interface']['showRecordFieldList'] = $GLOBALS['TCA']['sys_file']['interface']['showRecordFieldList'] . ',compressed,compress_log';
+$GLOBALS['TCA']['sys_file']['interface']['showRecordFieldList'] .= ',compressed,compress_error';
