@@ -7,7 +7,6 @@ use Aws\S3\S3Client;
 
 use Schmitzal\Tinyimg\Domain\Repository\FileRepository;
 use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -330,7 +329,7 @@ class CompressImageService
         /** @var \Schmitzal\Tinyimg\Domain\Model\File $extbaseFileObject */
         $extbaseFileObject = $this->fileRepository->findByUid($file->getUid());
         $extbaseFileObject->setCompressed(true);
-
+        $extbaseFileObject->resetCompressError();
         $this->fileRepository->update($extbaseFileObject);
         $this->persistenceManager->persistAll();
         try {
@@ -391,12 +390,11 @@ class CompressImageService
      */
     protected function saveError(File $file, \Exception $e)
     {
-        $connection = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ConnectionPool::class)->getConnectionForTable('sys_file');
-        $connection->update(
-            'sys_file',
-            ['compress_error' => $e->getCode() . ' : ' . $e->getMessage()],
-            ['uid' => (int)$file->getUid()]
-        );
-
+        /** @var \Schmitzal\Tinyimg\Domain\Model\File $extbaseFileObject */
+        $extbaseFileObject = $this->fileRepository->findByUid($file->getUid());
+        $extbaseFileObject->setCompressed(false);
+        $extbaseFileObject->setCompressError($e->getCode() . ' : ' . $e->getMessage());
+        $this->fileRepository->update($extbaseFileObject);
+        $this->persistenceManager->persistAll();
     }
 }
