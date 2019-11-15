@@ -164,6 +164,7 @@ class CompressImageService
                     $this->addMessageToFlashMessageQueue('success', [0 => (string)$percentageSaved . '%'], FlashMessage::INFO);
                 }
             } catch (\Exception $e) {
+                $this->saveError($file, $e);
                 $this->addMessageToFlashMessageQueue('compressionFailed', [0 => $e->getMessage()], FlashMessage::WARNING);
             }
         } else {
@@ -328,7 +329,7 @@ class CompressImageService
         /** @var \Schmitzal\Tinyimg\Domain\Model\File $extbaseFileObject */
         $extbaseFileObject = $this->fileRepository->findByUid($file->getUid());
         $extbaseFileObject->setCompressed(true);
-
+        $extbaseFileObject->resetCompressError();
         $this->fileRepository->update($extbaseFileObject);
         $this->persistenceManager->persistAll();
         try {
@@ -381,5 +382,19 @@ class CompressImageService
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
+    }
+
+    /**
+     * @param File $file
+     * @param \Exception $e
+     */
+    protected function saveError(File $file, \Exception $e)
+    {
+        /** @var \Schmitzal\Tinyimg\Domain\Model\File $extbaseFileObject */
+        $extbaseFileObject = $this->fileRepository->findByUid($file->getUid());
+        $extbaseFileObject->setCompressed(false);
+        $extbaseFileObject->setCompressError($e->getCode() . ' : ' . $e->getMessage());
+        $this->fileRepository->update($extbaseFileObject);
+        $this->persistenceManager->persistAll();
     }
 }
