@@ -144,13 +144,14 @@ class CompressImageService
             return;
         }
 
-        if (!in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
+        if (!in_array(strtolower($file->getMimeType()), ['image/png', 'image/jpeg'], true)) {
             return;
         }
 
         if ((int)$this->settings['debug'] === 0) {
-            $originalFileSize = $file->getSize();
             try {
+                $this->assureFileExists($file);
+                $originalFileSize = $file->getSize();
                 if ($this->checkForAmazonCdn($file)) {
                     $fileSize = $this->pushToTinyPngAndStoreToCdn($file);
                 } else {
@@ -163,6 +164,7 @@ class CompressImageService
                     $percentageSaved = (int)(100 - ((100 / $originalFileSize) * $fileSize));
                     $this->addMessageToFlashMessageQueue('success', [0 => (string)$percentageSaved . '%'], FlashMessage::INFO);
                 }
+                $this->updateFileInformation($file);
             } catch (\Exception $e) {
                 $this->saveError($file, $e);
                 $this->addMessageToFlashMessageQueue('compressionFailed', [0 => $e->getMessage()], FlashMessage::WARNING);
@@ -171,7 +173,21 @@ class CompressImageService
             $this->addMessageToFlashMessageQueue('debugMode', [], FlashMessage::INFO);
         }
 
-        $this->updateFileInformation($file);
+    }
+
+    /**
+     * @param File $file
+     * @throws \Exception
+     */
+    protected function assureFileExists(File $file): void
+    {
+        $absFileName = GeneralUtility::getFileAbsFileName(urldecode($file->getPublicUrl()));
+        if (file_exists($absFileName) === false) {
+            throw new \Exception('file not exists: ' . $absFileName, 1575270381);
+        }
+        if ((int)filesize($absFileName) === 0) {
+            throw new \Exception('filesize is 0: ' . $absFileName, 1575270380);
+        }
     }
 
 
