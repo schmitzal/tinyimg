@@ -1,5 +1,8 @@
 # Changelog
 
+### 1.5.1
+* **[FIX]** Set correct field definition and add event for cleanupProcessedFilesPostFileReplace
+
 ### 1.5.0
 * **[FEATURE]** Add support for TYPO3 10.0 - Thanks to @achimfritz, @davidsteeb and @bmack from @b13 GmbH
 * **[CHANGE]** Drop support for TYPO3 7.6
