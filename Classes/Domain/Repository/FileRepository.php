@@ -4,6 +4,8 @@ namespace Schmitzal\Tinyimg\Domain\Repository;
 
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
 use TYPO3\CMS\Extbase\Persistence\Repository;
+use TYPO3\CMS\Extbase\Persistence\QueryInterface;
+use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 
 /**
  * Class FileRepository
@@ -14,7 +16,7 @@ class FileRepository extends Repository
     /**
      * Do not respect storage pid for domain records
      */
-    public function createQuery()
+    public function createQuery(): QueryInterface
     {
         $query = parent::createQuery();
         $query->getQuerySettings()->setRespectStoragePage(false);
@@ -29,7 +31,7 @@ class FileRepository extends Repository
      * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      * @throws \TYPO3\CMS\Extbase\Persistence\Exception\InvalidQueryException
      */
-    public function findAllNonCompressedInStorageWithLimit(FileStorage $storage, $limit = 100, $excludeFolders = [])
+    public function findAllNonCompressedInStorageWithLimit(FileStorage $storage, $limit = 100, $excludeFolders = []): QueryResultInterface
     {
         $query = $this->createQuery();
 
@@ -45,7 +47,8 @@ class FileRepository extends Repository
                         $query->equals('storage', $storage),
                         $query->equals('compressed', false),
                         $query->equals('missing', false),
-                        $query->in('extension', ['png', 'jpg', 'jpeg'])
+                        $query->equals('compress_error', ''),
+                        $query->in('mime_type', ['image/png', 'image/jpeg'])
                     ],
                     $excludeFoldersConstraints
                 )

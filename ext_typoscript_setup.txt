@@ -1,3 +1,4 @@
+# this is required for TYPO3 < v10, for v10 Configuration/Extbase is used
 config.tx_extbase {
     persistence {
         classes {
@@ -13,8 +14,4 @@ config.tx_extbase {
             }
         }
     }
-}
-
-module.tx_filelist.view {
-    templateRootPaths.0 = EXT:tinyimg/Resources/Private/Templates/
 }
