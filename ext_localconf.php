@@ -23,7 +23,4 @@ if (TYPO3_MODE === 'BE') {
         true
     );
 
-    // Register command
-    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][$_EXTKEY] =
-        \Schmitzal\Tinyimg\Command\CompressImagesCommandController::class;
 }

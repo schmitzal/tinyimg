@@ -6,12 +6,12 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Alessandro Schmitz',
     'author_email' => 'alessandro.schmitz@interlutions.de',
     'author_company' => 'Interlutions GmbH',
-    'version' => '1.3.0',
+    'version' => '1.5.0',
     'state' => 'beta',
     'clearCacheOnLoad' => true,
     'constraints' => [
         'depends' => [
-            'typo3' => '7.6.0-9.5.99',
+            'typo3' => '8.7.0-10.99.99'
         ],
         'conflicts' => [],
         'suggests' => [],

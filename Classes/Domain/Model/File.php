@@ -18,9 +18,14 @@ class File extends \TYPO3\CMS\Extbase\Domain\Model\File
     protected $compressed = false;
 
     /**
+     * @var string
+     */
+    protected $compressError = '';
+
+    /**
      * @return int
      */
-    public function getStorage()
+    public function getStorage(): int
     {
         return $this->storage;
     }
@@ -28,7 +33,7 @@ class File extends \TYPO3\CMS\Extbase\Domain\Model\File
     /**
      * @param int $storage
      */
-    public function setStorage($storage)
+    public function setStorage(int $storage): void
     {
         $this->storage = $storage;
     }
@@ -36,7 +41,7 @@ class File extends \TYPO3\CMS\Extbase\Domain\Model\File
     /**
      * @return bool
      */
-    public function isCompressed()
+    public function isCompressed(): bool
     {
         return $this->compressed;
     }
@@ -44,8 +49,32 @@ class File extends \TYPO3\CMS\Extbase\Domain\Model\File
     /**
      * @param bool $compressed
      */
-    public function setCompressed($compressed)
+    public function setCompressed(bool $compressed): void
     {
         $this->compressed = $compressed;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompressError(): string
+    {
+        return $this->compressError;
+    }
+
+    /**
+     * @param string $compressError
+     */
+    public function setCompressError(string $compressError): void
+    {
+        $this->compressError = $compressError;
+    }
+
+    /**
+     * @return void
+     */
+    public function resetCompressError(): void
+    {
+        $this->setCompressError('');
     }
 }
