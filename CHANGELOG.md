@@ -1,9 +1,10 @@
 # Changelog
 
 ### 1.5.0
-* **[FEATURE]** Add support for TYPO3 10.0
+* **[FEATURE]** Add support for TYPO3 10.0 - Thanks to @achimfritz, @davidsteeb and @bmack from @b13 GmbH
 * **[CHANGE]** Drop support for TYPO3 7.6
-* **[CHANGE]** Rename TypoScript Setup File
+* **[CHANGE]** Rename TypoScript setup file
+* **[CHANGE]** Add compression errors and optimize flash messages
 
 ### 1.4.0
 * **[FEATURE]** Add option to exclude specific folders from compression - Thanks to @achimfritz, @davidsteeb and @bmack from @b13 GmbH
