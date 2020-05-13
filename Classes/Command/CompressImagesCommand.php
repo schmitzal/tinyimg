@@ -7,6 +7,7 @@ use Schmitzal\Tinyimg\Domain\Repository\FileRepository;
 use Schmitzal\Tinyimg\Domain\Repository\FileStorageRepository;
 use Schmitzal\Tinyimg\Service\CompressImageService;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Resource\Event\AfterFileReplacedEvent;
 use TYPO3\CMS\Core\Resource\Processing\FileDeletionAspect;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -117,7 +118,9 @@ class CompressImagesCommand extends Command
             if ($file instanceof \Schmitzal\Tinyimg\Domain\Model\File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
                 $this->compressImageService->initializeCompression($file);
-                $fileDeletionAspect->cleanupProcessedFilesPostFileReplace($file, '');
+                $fileDeletionAspect->cleanupProcessedFilesPostFileReplace(
+                    new AfterFileReplacedEvent($file, '')
+                );
             }
         }
     }
