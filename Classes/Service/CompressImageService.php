@@ -144,13 +144,14 @@ class CompressImageService
             return;
         }
 
-        if (!in_array(strtolower($file->getExtension()), ['png', 'jpg', 'jpeg'], true)) {
+        if (!in_array(strtolower($file->getMimeType()), ['image/png', 'image/jpeg'], true)) {
             return;
         }
 
         if ((int)$this->settings['debug'] === 0) {
-            $originalFileSize = $file->getSize();
             try {
+                $this->assureFileExists($file);
+                $originalFileSize = $file->getSize();
                 if ($this->checkForAmazonCdn($file)) {
                     $fileSize = $this->pushToTinyPngAndStoreToCdn($file);
                 } else {
@@ -163,14 +164,30 @@ class CompressImageService
                     $percentageSaved = (int)(100 - ((100 / $originalFileSize) * $fileSize));
                     $this->addMessageToFlashMessageQueue('success', [0 => (string)$percentageSaved . '%'], FlashMessage::INFO);
                 }
+                $this->updateFileInformation($file);
             } catch (\Exception $e) {
+                $this->saveError($file, $e);
                 $this->addMessageToFlashMessageQueue('compressionFailed', [0 => $e->getMessage()], FlashMessage::WARNING);
             }
         } else {
             $this->addMessageToFlashMessageQueue('debugMode', [], FlashMessage::INFO);
         }
 
-        $this->updateFileInformation($file);
+    }
+
+    /**
+     * @param File $file
+     * @throws \Exception
+     */
+    protected function assureFileExists(File $file): void
+    {
+        $absFileName = GeneralUtility::getFileAbsFileName(urldecode($file->getPublicUrl()));
+        if (file_exists($absFileName) === false) {
+            throw new \Exception('file not exists: ' . $absFileName, 1575270381);
+        }
+        if ((int)filesize($absFileName) === 0) {
+            throw new \Exception('filesize is 0: ' . $absFileName, 1575270380);
+        }
     }
 
 
@@ -328,7 +345,7 @@ class CompressImageService
         /** @var \Schmitzal\Tinyimg\Domain\Model\File $extbaseFileObject */
         $extbaseFileObject = $this->fileRepository->findByUid($file->getUid());
         $extbaseFileObject->setCompressed(true);
-
+        $extbaseFileObject->resetCompressError();
         $this->fileRepository->update($extbaseFileObject);
         $this->persistenceManager->persistAll();
         try {
@@ -381,5 +398,19 @@ class CompressImageService
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
+    }
+
+    /**
+     * @param File $file
+     * @param \Exception $e
+     */
+    protected function saveError(File $file, \Exception $e)
+    {
+        /** @var \Schmitzal\Tinyimg\Domain\Model\File $extbaseFileObject */
+        $extbaseFileObject = $this->fileRepository->findByUid($file->getUid());
+        $extbaseFileObject->setCompressed(false);
+        $extbaseFileObject->setCompressError($e->getCode() . ' : ' . $e->getMessage());
+        $this->fileRepository->update($extbaseFileObject);
+        $this->persistenceManager->persistAll();
     }
 }

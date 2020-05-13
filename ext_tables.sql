@@ -3,4 +3,5 @@
 #
 CREATE TABLE sys_file (
   compressed SMALLINT(5) UNSIGNED DEFAULT '0' NOT NULL,
+  compress_error text DEFAULT '' NOT NULL
 );

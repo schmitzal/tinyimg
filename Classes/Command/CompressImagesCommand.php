@@ -116,10 +116,8 @@ class CompressImagesCommand extends Command
         foreach ($files as $file) {
             if ($file instanceof \Schmitzal\Tinyimg\Domain\Model\File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
-                if (@filesize(GeneralUtility::getFileAbsFileName(urldecode($file->getPublicUrl()))) > 0) {
-                    $this->compressImageService->initializeCompression($file);
-                    $fileDeletionAspect->cleanupProcessedFilesPostFileReplace($file, '');
-                }
+                $this->compressImageService->initializeCompression($file);
+                $fileDeletionAspect->cleanupProcessedFilesPostFileReplace($file, '');
             }
         }
     }
