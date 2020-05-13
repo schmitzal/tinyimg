@@ -172,7 +172,6 @@ class CompressImageService
         } else {
             $this->addMessageToFlashMessageQueue('debugMode', [], FlashMessage::INFO);
         }
-
     }
 
     /**
