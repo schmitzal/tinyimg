@@ -348,6 +348,7 @@ class CompressImageService
         $this->fileRepository->update($extbaseFileObject);
         $this->persistenceManager->persistAll();
         try {
+            clearstatcache();
             $splFileObject = new \SplFileObject(GeneralUtility::getFileAbsFileName($file->getPublicUrl()));
             return (int)$splFileObject->getSize();
         } catch (\Exception $e) {
