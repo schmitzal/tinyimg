@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.5.2
+* **[FIX]** Clear file information cache before calculating saved percentage after compression
+* **[CHANGE]** Set typo3/cms-core dependency to security fixed versions
+
 ### 1.5.1
 * **[FIX]** Set correct field definition and add event for cleanupProcessedFilesPostFileReplace
 
