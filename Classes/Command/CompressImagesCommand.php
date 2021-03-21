@@ -87,7 +87,7 @@ class CompressImagesCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit = (int)$input->getArgument('limit');
         $this->initializeDependencies();
@@ -99,6 +99,8 @@ class CompressImagesCommand extends Command
             $this->compressImages($files);
             $this->clearPageCache();
         }
+
+        return Command::SUCCESS;
     }
 
     /**
