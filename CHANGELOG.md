@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.5.3
+* **[FIX]** Add correct return type to compress command
+* **[FIX]** Remove deprecated replace and add extension key in composer json
+
 ### 1.5.2
 * **[FIX]** Clear file information cache before calculating saved percentage after compression
 * **[CHANGE]** Set typo3/cms-core dependency to security fixed versions
