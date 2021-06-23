@@ -1,5 +1,8 @@
 # Changelog
 
+### 1.5.4
+* **[FIX]** Add compatibility condition for compression command to avoid event not found exception for TYPO3 version lower 10
+
 ### 1.5.3
 * **[FIX]** Add correct return type to compress command
 * **[FIX]** Remove deprecated replace and add extension key in composer json

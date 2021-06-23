@@ -120,9 +120,13 @@ class CompressImagesCommand extends Command
             if ($file instanceof \Schmitzal\Tinyimg\Domain\Model\File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
                 $this->compressImageService->initializeCompression($file);
-                $fileDeletionAspect->cleanupProcessedFilesPostFileReplace(
-                    new AfterFileReplacedEvent($file, '')
-                );
+                if (version_compare(TYPO3_version, '10', '<')) {
+                    $fileDeletionAspect->cleanupProcessedFilesPostFileReplace($file, '');
+                } else {
+                    $fileDeletionAspect->cleanupProcessedFilesPostFileReplace(
+                        new AfterFileReplacedEvent($file, '')
+                    );
+                }
             }
         }
     }
