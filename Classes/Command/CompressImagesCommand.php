@@ -100,7 +100,7 @@ class CompressImagesCommand extends Command
             $this->clearPageCache();
         }
 
-        return Command::SUCCESS;
+        return 0;
     }
 
     /**
