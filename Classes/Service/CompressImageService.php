@@ -174,13 +174,18 @@ class CompressImageService
         }
     }
 
+    protected function getAbsoluteFileName(File $file): string
+    {
+        return urldecode(rtrim(Environment::getPublicPath(), '/') . '/' . ltrim($file->getPublicUrl(), '/'));
+    }
+
     /**
      * @param File $file
      * @throws \Exception
      */
     protected function assureFileExists(File $file): void
     {
-        $absFileName = GeneralUtility::getFileAbsFileName(urldecode($file->getPublicUrl()));
+        $absFileName = $this->getAbsoluteFileName($file);
         if (file_exists($absFileName) === false) {
             throw new \Exception('file not exists: ' . $absFileName, 1575270381);
         }
@@ -349,7 +354,7 @@ class CompressImageService
         $this->persistenceManager->persistAll();
         try {
             clearstatcache();
-            $splFileObject = new \SplFileObject(GeneralUtility::getFileAbsFileName($file->getPublicUrl()));
+            $splFileObject = new \SplFileObject($this->getAbsoluteFileName($file));
             return (int)$splFileObject->getSize();
         } catch (\Exception $e) {
             return null;

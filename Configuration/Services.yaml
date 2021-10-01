@@ -1,0 +1,26 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Schmitzal\Tinyimg\Service\:
+    resource: '../Classes/Service/*'
+  Schmitzal\Tinyimg\Domain\Repository\:
+    resource: '../Classes/Domain/Repository/*'
+
+  Schmitzal\Tinyimg\Command\CompressImagesCommand:
+    tags:
+      - name: 'console.command'
+        command: 'compressImages:compress'
+        schedulable: true
+  Schmitzal\Tinyimg\Event\Listener\AfterFileReplaced:
+    tags:
+      - name: event.listener
+        identifier: 'schmitzal-tinyimg-afterFileReplaced'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileReplacedEvent
+  Schmitzal\Tinyimg\Event\Listener\AfterFileAdded:
+    tags:
+      - name: event.listener
+        identifier: 'schmitzal-tinyimg-afterFileAdded'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileAddedEvent

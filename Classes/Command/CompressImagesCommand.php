@@ -96,8 +96,10 @@ class CompressImagesCommand extends Command
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
             $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['excludeFolders'], true);
             $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, $limit, $excludeFolders);
-            $this->compressImages($files);
-            $this->clearPageCache();
+            if (!empty($files)) {
+                $this->compressImages($files);
+                $this->clearPageCache();
+            }
         }
 
         return 0;
