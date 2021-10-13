@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.6.0
+* **[FEATURE]** Add support for TYPO3 11 - drop support for TYPO3 8 - Thanks to @achimfritz
+* **[FIX]** Prevent cache flushing when no files found
+* **[FIX]** Change return value of compression command to avoid exceptions with different symfony/console versions
+
 ### 1.5.4
 * **[FIX]** Add compatibility condition for compression command to avoid event not found exception for TYPO3 version lower 10
 
