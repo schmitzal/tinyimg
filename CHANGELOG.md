@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.6.1
+* **[FIX]** Fix PHP 8.0 issue with sys_file TCA - Thanks to @bmack
+* **[CHANGE]** Use secure composer dependencies e.g. TYPO3 11.5 not 11.4
+
 ### 1.6.0
 * **[FEATURE]** Add support for TYPO3 11 - drop support for TYPO3 8 - Thanks to @achimfritz
 * **[FIX]** Prevent cache flushing when no files found
