@@ -148,7 +148,7 @@ class CompressImageService
             return;
         }
 
-        if ((int)$this->settings['debug'] === 0) {
+        if ((int)($this->settings['debug'] ?? 1) === 0) {
             try {
                 $this->assureFileExists($file);
                 $originalFileSize = $file->getSize();
