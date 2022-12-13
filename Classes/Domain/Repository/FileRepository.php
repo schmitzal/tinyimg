@@ -42,16 +42,14 @@ class FileRepository extends Repository
 
         $query->matching(
             $query->logicalAnd(
-                array_merge(
+                ...array_merge(
                     [
                         $query->equals('storage', $storage),
                         $query->equals('compressed', false),
                         $query->equals('missing', false),
                         $query->logicalOr(
-                            [
-                                $query->equals('compress_error', null),
-                                $query->equals('compress_error', ''),
-                            ]
+                            $query->equals('compress_error', null),
+                            $query->equals('compress_error', ''),
                         ),
                         $query->in('mime_type', ['image/png', 'image/jpeg'])
                     ],

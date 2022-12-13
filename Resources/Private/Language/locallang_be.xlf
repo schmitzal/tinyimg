@@ -24,6 +24,12 @@
 			<trans-unit id="version">
                 <source>Enter the AWS version</source>
             </trans-unit>
+			<trans-unit id="debug">
+				<source>Enable or disable debugging mode. Stops extension from compressing images. Use in development mode to avoid waisting compressions.</source>
+			</trans-unit>
+			<trans-unit id="excludeFolders">
+				<source>Comma-separated list of folders which should be excluded from compression. Relative from storage (e.g. fileadmin), starting with "/" (e.g. "/user_upload,/folder_under_fileadmin")</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

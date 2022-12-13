@@ -30,10 +30,8 @@ Make sure to have an updated index. TYPO3 comes with an index updater as a sched
 Also be aware that the tinify API is limited to 500 free compressions (see note above). So on huge websites it will be reached quickly.
 
 ## TypoScript reference
-| Setting        | Type   | Default | Description                                                                                                                        |
-|----------------|--------|---------|------------------------------------------------------------------------------------------------------------------------------------|
-| debug          | bool   | 0       | Enable or disable debugging mode. Stops extension from compressing images. Use in development mode to avoid waisting compressions. |
-| excludeFolders | string | empty   | Comma-separated list of folders which should be excluded from compression. Relative from storage (e.g. fileadmin), starting with "/" (e.g. "/user_upload,/folder_under_fileadmin") |
+
+is moved to extension configuration
 
 ## Contribution
 Bugs and feature requests are welcome. Feel free to create an [issue](https://github.com/schmitzal/tinyimg/issues) and i'll have a look at it as soon as possible.
