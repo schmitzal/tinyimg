@@ -4,10 +4,9 @@ services:
     autoconfigure: true
     public: false
 
-  Schmitzal\Tinyimg\Service\:
-    resource: '../Classes/Service/*'
-  Schmitzal\Tinyimg\Domain\Repository\:
-    resource: '../Classes/Domain/Repository/*'
+  Schmitzal\Tinyimg\:
+    resource: '../Classes/*'
+    exclude: '../Classes/Domain/Model/*'
 
   Schmitzal\Tinyimg\Command\CompressImagesCommand:
     tags:

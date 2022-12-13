@@ -1,16 +1,7 @@
+# this works only for TYPO3 < 11
 module.tx_filelist.view {
     templateRootPaths.0 = EXT:tinyimg/Resources/Private/Templates/
 }
 
-module.tx_tinyimg.settings {
-  debug = 0
-  excludeFolders =
-}
-
-[applicationContext == "Development"]
-  module.tx_tinyimg.settings.debug = 1
-[global]
-[like(applicationContext, "Development*")]
-  module.tx_tinyimg.settings.debug = 1
-[global]
+# module.tx_tinyimg.settings are moved into Extension Configuration
 

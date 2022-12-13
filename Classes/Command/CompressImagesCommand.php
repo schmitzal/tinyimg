@@ -7,6 +7,7 @@ use Schmitzal\Tinyimg\Domain\Repository\FileRepository;
 use Schmitzal\Tinyimg\Domain\Repository\FileStorageRepository;
 use Schmitzal\Tinyimg\Service\CompressImageService;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Resource\Event\AfterFileReplacedEvent;
 use TYPO3\CMS\Core\Resource\Processing\FileDeletionAspect;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -15,10 +16,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 
 /**
  * Class CompressImagesCommandController
@@ -49,10 +47,19 @@ class CompressImagesCommand extends Command
      */
     protected $compressImageService;
 
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
+    public function __construct(
+        FileStorageRepository $fileStorageRepository,
+        FileRepository $fileRepository,
+        ResourceFactory $resourceFactory,
+        CompressImageService $compressImageService,
+        string $name = null
+    ) {
+        $this->fileStorageRepository = $fileStorageRepository;
+        $this->fileRepository = $fileRepository;
+        $this->resourceFactory = $resourceFactory;
+        $this->compressImageService = $compressImageService;
+        parent::__construct($name);
+    }
 
     /**
      * @return void
@@ -70,18 +77,6 @@ class CompressImagesCommand extends Command
     }
 
     /**
-     * @throws \TYPO3\CMS\Extbase\Object\Exception
-     */
-    protected function initializeDependencies(): void
-    {
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->fileStorageRepository = $this->objectManager->get(FileStorageRepository::class);
-        $this->fileRepository = $this->objectManager->get(FileRepository::class);
-        $this->resourceFactory = $this->objectManager->get(ResourceFactory::class);
-        $this->compressImageService = $this->objectManager->get(CompressImageService::class);
-    }
-
-    /**
      * Executes the command for adding the lock file
      *
      * @param InputInterface $input
@@ -90,11 +85,10 @@ class CompressImagesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit = (int)$input->getArgument('limit');
-        $this->initializeDependencies();
-        $settings = $this->getTypoScriptConfiguration();
+        $settings = (GeneralUtility::makeInstance(ExtensionConfiguration::class))->get('tinyimg');
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
-            $excludeFolders = GeneralUtility::trimExplode(',', (string)$settings['excludeFolders'], true);
+            $excludeFolders = GeneralUtility::trimExplode(',', (string)($settings['excludeFolders'] ?? ''), true);
             $files = $this->fileRepository->findAllNonCompressedInStorageWithLimit($fileStorage, $limit, $excludeFolders);
             if (!empty($files)) {
                 $this->compressImages($files);
@@ -122,13 +116,9 @@ class CompressImagesCommand extends Command
             if ($file instanceof \Schmitzal\Tinyimg\Domain\Model\File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
                 $this->compressImageService->initializeCompression($file);
-                if (version_compare(TYPO3_version, '10', '<')) {
-                    $fileDeletionAspect->cleanupProcessedFilesPostFileReplace($file, '');
-                } else {
-                    $fileDeletionAspect->cleanupProcessedFilesPostFileReplace(
-                        new AfterFileReplacedEvent($file, '')
-                    );
-                }
+                $fileDeletionAspect->cleanupProcessedFilesPostFileReplace(
+                    new AfterFileReplacedEvent($file, '')
+                );
             }
         }
     }
@@ -142,20 +132,5 @@ class CompressImagesCommand extends Command
         /** @var CacheManager $cacheManager */
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $cacheManager->flushCachesInGroup('pages');
-    }
-
-    /**
-     * @return array
-     * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
-     */
-    protected function getTypoScriptConfiguration(): array
-    {
-        /** @var ConfigurationManager $configurationManager */
-        $configurationManager = $this->objectManager->get(ConfigurationManager::class);
-
-        return (array)$configurationManager->getConfiguration(
-            ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
-            'tinyimg'
-        );
     }
 }

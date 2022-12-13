@@ -6,16 +6,15 @@ use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 
 use Schmitzal\Tinyimg\Domain\Repository\FileRepository;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Resource\Index\Indexer;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
@@ -23,12 +22,8 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
  * Class CompressImageService
  * @package Schmitzal\Tinyimg\Service
  */
-class CompressImageService
+class CompressImageService implements SingletonInterface
 {
-    /**
-     * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
-     */
-    protected $objectManager = null;
 
     /**
      * @var \Schmitzal\Tinyimg\Domain\Repository\FileRepository
@@ -46,36 +41,18 @@ class CompressImageService
     protected $extConf = [];
 
     /**
-     * @var array
-     */
-    protected $settings = [];
-
-    /**
      * @var S3Client
      */
     protected $client = null;
 
     /**
-     * @param ObjectManager $objectManager
-     */
-    public function injectObjectManager(ObjectManager $objectManager): void
-    {
-        $this->objectManager = $objectManager;
-    }
-
-    /**
      * @param FileRepository $fileRepository
      */
-    public function injectFileRepository(FileRepository $fileRepository): void
-    {
+    public function __construct(
+        FileRepository $fileRepository,
+        PersistenceManager $persistenceManager
+    ) {
         $this->fileRepository = $fileRepository;
-    }
-
-    /**
-     * @param PersistenceManager $persistenceManager
-     */
-    public function injectPersistenceManager(PersistenceManager $persistenceManager): void
-    {
         $this->persistenceManager = $persistenceManager;
     }
 
@@ -86,19 +63,13 @@ class CompressImageService
      */
     public function initAction(): void
     {
-        if (version_compare(TYPO3_version, '9', '>')) {
-            $this->extConf = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyimg'];
-        } else {
-            // @extensionScannerIgnoreLine
-            $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyimg']);
-        }
+        $this->extConf = (GeneralUtility::makeInstance(ExtensionConfiguration::class))->get('tinyimg');
 
         if (ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3')) {
             $this->initCdn();
         }
 
         \Tinify\setKey($this->getApiKey());
-        $this->settings = $this->getTypoScriptConfiguration();
     }
 
     /**
@@ -106,12 +77,7 @@ class CompressImageService
      */
     protected function getPublicPath(): string
     {
-        if (version_compare(TYPO3_version, '9', '>')) {
-            return Environment::getPublicPath() . '/';
-        } else {
-            // @extensionScannerIgnoreLine
-            return PATH_site;
-        }
+        return Environment::getPublicPath() . '/';
     }
 
     /**
@@ -148,7 +114,7 @@ class CompressImageService
             return;
         }
 
-        if ((int)($this->settings['debug'] ?? 1) === 0) {
+        if ((int)($this->extConf['debug'] ?? 1) === 0) {
             try {
                 $this->assureFileExists($file);
                 $originalFileSize = $file->getSize();
@@ -202,8 +168,8 @@ class CompressImageService
      */
     protected function isFileInExcludeFolder(File $file): bool
     {
-        if (!empty($this->settings['excludeFolders'])) {
-            $excludeFolders = GeneralUtility::trimExplode(',', $this->settings['excludeFolders'], true);
+        if (!empty($this->extConf['excludeFolders'])) {
+            $excludeFolders = GeneralUtility::trimExplode(',', $this->extConf['excludeFolders'], true);
             $identifier = $file->getIdentifier();
             foreach ($excludeFolders as $excludeFolder) {
                 if (strpos($identifier, $excludeFolder) === 0) {
@@ -319,10 +285,7 @@ class CompressImageService
      */
     protected function getTypoScriptConfiguration(): array
     {
-        /** @var ConfigurationManager $configurationManager */
-        $configurationManager = $this->objectManager->get(ConfigurationManager::class);
-
-        return (array)$configurationManager->getConfiguration(
+        return $this->configurationManager->getConfiguration(
             ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
             'tinyimg'
         );
@@ -333,8 +296,8 @@ class CompressImageService
      */
     protected function updateFileInformation(File $file): void
     {
-        /** @var Indexer $fileIndexer */
-        $fileIndexer = $this->objectManager->get(Indexer::class, $file->getStorage());
+        $storage = $file->getStorage();
+        $fileIndexer = GeneralUtility::makeInstance(Indexer::class, $storage);
         $fileIndexer->updateIndexEntry($file);
     }
 
@@ -366,11 +329,7 @@ class CompressImageService
      */
     protected function isCli(): bool
     {
-        if (version_compare(TYPO3_version, '9', '>')) {
-            return Environment::isCli();
-        } else {
-            return php_sapi_name() === 'cli';
-        }
+        return Environment::isCli();
     }
 
 

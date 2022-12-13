@@ -1,21 +1,27 @@
 # cat=basic/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:apiKey
 apiKey =
 
+# cat=basic/enable; type=boolean; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:debug
+debug = 0
+
+# cat=basic/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:excludeFolders
+excludeFolders =
+
 ## CDN USAGE ##
-# cat=basic/enable; type=boolean; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:useCdn
+# cat=cdn/enable; type=boolean; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:useCdn
 useCdn =
 
-# cat=basic/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:bucket
+# cat=cdn/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:bucket
 bucket =
 
-# cat=basic/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:key
+# cat=cdn/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:key
 key =
 
-# cat=basic/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:secret
+# cat=cdn/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:secret
 secret =
 
-# cat=basic/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:region
+# cat=cdn/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:region
 region =
 
-# cat=basic/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:version
+# cat=cdn/enable; type=string; label=LLL:EXT:tinyimg/Resources/Private/Language/locallang_be.xlf:version
 version = 2006-03-01
