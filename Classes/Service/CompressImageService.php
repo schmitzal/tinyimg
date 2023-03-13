@@ -150,7 +150,9 @@ class CompressImageService
 
         if ((int)($this->settings['debug'] ?? 1) === 0) {
             try {
-                $this->assureFileExists($file);
+                if(!$this->getUseCdn()){
+                    $this->assureFileExists($file);
+                }
                 $originalFileSize = $file->getSize();
                 if ($this->checkForAmazonCdn($file)) {
                     $fileSize = $this->pushToTinyPngAndStoreToCdn($file);
