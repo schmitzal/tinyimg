@@ -116,7 +116,9 @@ class CompressImageService implements SingletonInterface
 
         if ((int)($this->extConf['debug'] ?? 1) === 0) {
             try {
-                $this->assureFileExists($file);
+                if(!$this->getUseCdn()){
+                    $this->assureFileExists($file);
+                }
                 $originalFileSize = $file->getSize();
                 if ($this->checkForAmazonCdn($file)) {
                     $fileSize = $this->pushToTinyPngAndStoreToCdn($file);
