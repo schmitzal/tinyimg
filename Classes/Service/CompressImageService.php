@@ -280,18 +280,6 @@ class CompressImageService implements SingletonInterface
     }
 
     /**
-     * @return array
-     * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
-     */
-    protected function getTypoScriptConfiguration(): array
-    {
-        return $this->configurationManager->getConfiguration(
-            ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
-            'tinyimg'
-        );
-    }
-
-    /**
      * @param File $file
      */
     protected function updateFileInformation(File $file): void
