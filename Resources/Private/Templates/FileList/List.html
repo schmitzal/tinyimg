@@ -1,0 +1,10 @@
+<f:be.pageRenderer
+    includeJavaScriptModules="{0: '@schmitzal/tinyimg/ExtendedUpload.js'}"
+    includeCssFiles="{0: 'EXT:tinyimg/Resources/Public/Css/ExtendedUpload.css'}"/>
+
+<div class="table-fit">
+    <table class="table table-striped table-hover" id="typo3-filelist">
+        <thead>{tableHeader -> f:format.raw()}</thead>
+        <tbody data-multi-record-selection-row-selection="true">{tableBody -> f:format.raw()}</tbody>
+    </table>
+</div>

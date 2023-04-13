@@ -23,3 +23,8 @@ services:
       - name: event.listener
         identifier: 'schmitzal-tinyimg-afterFileAdded'
         event: TYPO3\CMS\Core\Resource\Event\AfterFileAddedEvent
+  Schmitzal\Tinyimg\EventListener\AfterBackendPageRenderEventListener:
+    tags:
+      - name: event.listener
+        identifier: 'schmitzal-tinyimg-afterBackendPageRender'
+        event: TYPO3\CMS\Backend\Controller\Event\AfterBackendPageRenderEvent
