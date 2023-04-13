@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.7.0
+* **[FEATURE]** Add support for TYPO3 12 - drop support for TYPO3 9 - Thanks to @achimfritz
+* **[CHANGE]** Move TypoScript configuration to extension configuration
+* **[FIX]** Avoid error while checking if a file exists if using CDN
+* **[FIX]** Move TCA Modifications from ext_tables.php to TCA overrides
+* **[FIX]** Prevent access of undefined array key in compression service
+
 ### 1.6.1
 * **[FIX]** Fix PHP 8.0 issue with sys_file TCA - Thanks to @bmack
 * **[CHANGE]** Use secure composer dependencies e.g. TYPO3 11.5 not 11.4

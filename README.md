@@ -2,16 +2,12 @@
 Image compression for all pngs and jpgs uploaded to the backend (using the tinypng API)
 
 ## What does it do?
-It's a small extension, that hooks (using signals) into the TYPO3 file upload and compresses every jpg or png uploaded to the backend using the tinify API: https://tinypng.com/developers
+It's a small extension, that hooks (using events) into the TYPO3 file upload and compresses every jpg or png uploaded to the backend using the tinify API: https://tinypng.com/developers
 
 This API can reduce up to 80% of the file size of your images, which will increase your page speed. Without loosing quality.
 
-## Installation via composer
-1. Get extension tinyimg: `composer require schmitzal/tinyimg`
-2. Active extension (using extension manager or commandline)
-
-#### _Installation via extension manager_
-Installing the extension via extension manager is possible but as tinyimg requires the [tinify/tinify](https://packagist.org/packages/tinify/tinify) library you will have to take care of installing this package manually.
+## Installation
+`composer require schmitzal/tinyimg`
 
 ## Configuration
 1. Create an API key* at https://tinypng.com/developers
