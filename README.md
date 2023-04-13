@@ -16,14 +16,15 @@ Installing the extension via extension manager is possible but as tinyimg requir
 ## Configuration
 1. Create an API key* at https://tinypng.com/developers
 2. Enter the API key* in the extension configuration
-3. Include the static TypoScript. It disables compression while on application context "Development" - so you wont loose compressions during development and testing
-4. Have a nice day :)
+3. TYPO3 < 12: Include the static TypoScript. It disables compression while on application context "Development", so you won't lose compressions during development and testing 
+4. TYPO3 >= 12: Disables compression in extension settings if desired, so you won't lose compressions during development and testing
+5. Have a nice day :)
 
 <span style="font-size: 80%">_*Note that the tinify API is limited to 500 compressions per month.
-If you need more, there is a payed version which can be activated in your dashboard (where you got your API key)_</span>
+If you need more, there is a paid version which can be activated in your dashboard (where you got your API key)_</span>
 
 ## Setup for already existing projects
-This extension contains an extbase command which runs through all files storages and compresses 100 images in it on each run. Depending on the size of this images this takes a while.
+This extension contains a command which runs through all file storages and compresses 100 images in it on each run. Depending on the size of these images this takes a while.
 
 Make sure to have an updated index. TYPO3 comes with an index updater as a scheduler task called "File Abstraction Layer: Update storage index (scheduler)".
 
@@ -31,10 +32,10 @@ Also be aware that the tinify API is limited to 500 free compressions (see note 
 
 ## TypoScript reference
 
-is moved to extension configuration
+Configuration has been moved to extension settings
 
 ## Contribution
-Bugs and feature requests are welcome. Feel free to create an [issue](https://github.com/schmitzal/tinyimg/issues) and i'll have a look at it as soon as possible.
+Bugs and feature requests are welcome. Feel free to create an [issue](https://github.com/schmitzal/tinyimg/issues), and I'll have a look at it as soon as possible.
 
 Code improvements are also highly appreciated, as I'm a young developer and sure there is stuff to optimize.
 
