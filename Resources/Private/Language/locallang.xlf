@@ -3,7 +3,7 @@
 	<file source-language="en" product-name="tinyimg">
 		<header/>
 		<body>
-			<trans-unit id="compressingLabel">
+			<trans-unit id="tinyimg.compressingLabel">
                 <source>Image is getting compressed...</source>
             </trans-unit>
 			<trans-unit id="flashMessage.message.folderExcluded">

@@ -1,5 +1,8 @@
 # Changelog
 
+### 1.8.0
+* **[FEATURE]** Make extension compatible with TYPO3 13, including full refactoring and dropping TYPO3 10, 11 and 12 support
+
 ### 1.7.0
 * **[FEATURE]** Add support for TYPO3 12 - drop support for TYPO3 9 - Thanks to @achimfritz
 * **[CHANGE]** Move TypoScript configuration to extension configuration

@@ -3,7 +3,7 @@
 	<file source-language="en" product-name="tinyimg">
 		<header/>
 		<body>
-			<trans-unit id="compressingLabel">
+			<trans-unit id="tinyimg.compressingLabel">
                 <source>Bild wird komprimiert...</source>
             </trans-unit>
 		</body>

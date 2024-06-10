@@ -1,10 +1,13 @@
 <?php
 
+use Schmitzal\Tinyimg\Domain\Model\File;
+use Schmitzal\Tinyimg\Domain\Model\FileStorage;
+
 return [
-    \Schmitzal\Tinyimg\Domain\Model\FileStorage::class => [
+    FileStorage::class => [
         'tableName' => 'sys_file_storage'
     ],
-    \Schmitzal\Tinyimg\Domain\Model\File::class => [
+    File::class => [
         'tableName' => 'sys_file'
     ]
 ];
