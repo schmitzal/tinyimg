@@ -1,5 +1,9 @@
 <?php
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
+defined('TYPO3') or die();
+
 $sysFileColumns = [
     'compressed' => [
         'exclude' => true,
@@ -19,5 +23,5 @@ $sysFileColumns = [
     ]
 ];
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('sys_file', $sysFileColumns);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('sys_file', 'compress_error', '', '');
+ExtensionManagementUtility::addTCAcolumns('sys_file', $sysFileColumns);
+ExtensionManagementUtility::addToAllTCAtypes('sys_file', 'compress_error');

@@ -36,5 +36,5 @@ Bugs and feature requests are welcome. Feel free to create an [issue](https://gi
 Code improvements are also highly appreciated, as I'm a young developer and sure there is stuff to optimize.
 
 ## Sponsoring
-This extension is powered by [Interlutions GmbH](https://www.interlutions.de/).
-Most of the time working on this extension is at work, so my thanks go to Interlutions. :)
+This extension is powered by [OPEN Digitalgruppe GmbH](https://www.open.de/).
+Most of the time working on this extension is at work, so my thanks go to Open. :)

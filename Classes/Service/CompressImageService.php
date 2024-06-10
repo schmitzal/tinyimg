@@ -4,62 +4,39 @@ namespace Schmitzal\Tinyimg\Service;
 
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
-
 use Schmitzal\Tinyimg\Domain\Repository\FileRepository;
+use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
+use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Resource\Index\Indexer;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
+use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
-/**
- * Class CompressImageService
- * @package Schmitzal\Tinyimg\Service
- */
 class CompressImageService implements SingletonInterface
 {
+    protected array $extConf = [];
+    protected ?S3Client $client = null;
 
-    /**
-     * @var \Schmitzal\Tinyimg\Domain\Repository\FileRepository
-     */
-    protected $fileRepository = null;
-
-    /**
-     * @var \TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface
-     */
-    protected $persistenceManager = null;
-
-    /**
-     * @var array
-     */
-    protected $extConf = [];
-
-    /**
-     * @var S3Client
-     */
-    protected $client = null;
-
-    /**
-     * @param FileRepository $fileRepository
-     */
     public function __construct(
-        FileRepository $fileRepository,
-        PersistenceManager $persistenceManager
+        protected FileRepository $fileRepository,
+        protected PersistenceManager $persistenceManager
     ) {
-        $this->fileRepository = $fileRepository;
-        $this->persistenceManager = $persistenceManager;
     }
 
     /**
-     * CompressImageService constructor.
-     * @throws \TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException
-     * @throws \TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException
+     * @throws ExtensionConfigurationExtensionNotConfiguredException
+     * @throws ExtensionConfigurationPathDoesNotExistException
      */
     public function initAction(): void
     {
@@ -72,37 +49,27 @@ class CompressImageService implements SingletonInterface
         \Tinify\setKey($this->getApiKey());
     }
 
-    /**
-     * @return string
-     */
-    protected function getPublicPath(): string
-    {
-        return Environment::getPublicPath() . '/';
-    }
-
-    /**
-     * initialize the CDN
-     */
     public function initCdn(): void
     {
         /** @var S3Client client */
-        $this->client = S3Client::factory(array(
-            'region' => $this->extConf['region'],
-            'version' => $this->extConf['version'],
-            'credentials' => array(
-                'key' => $this->extConf['key'],
-                'secret' => $this->extConf['secret'],
-            ),
-        ));
+        $this->client = S3Client::factory(
+            [
+                'region' => $this->extConf['region'],
+                'version' => $this->extConf['version'],
+                'credentials' => [
+                    'key' => $this->extConf['key'],
+                    'secret' => $this->extConf['secret'],
+                ],
+            ]
+        );
     }
 
     /**
-     * @param File $file
-     * @throws \TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
+     * @throws IllegalObjectTypeException
+     * @throws UnknownObjectException
+     * @throws Exception
      */
-    public function initializeCompression($file): void
+    public function initializeCompression(File $file): void
     {
         $this->initAction();
 
@@ -110,13 +77,22 @@ class CompressImageService implements SingletonInterface
             return;
         }
 
-        if (!in_array(strtolower($file->getMimeType()), ['image/png', 'image/jpeg'], true)) {
+        if (
+            !in_array(
+                strtolower($file->getMimeType()),
+                [
+                'image/png',
+                'image/jpeg',
+                ],
+                true
+            )
+        ) {
             return;
         }
 
         if ((int)($this->extConf['debug'] ?? 1) === 0) {
             try {
-                if(!$this->getUseCdn()){
+                if (!$this->getUseCdn()) {
                     $this->assureFileExists($file);
                 }
                 $originalFileSize = $file->getSize();
@@ -130,66 +106,30 @@ class CompressImageService implements SingletonInterface
                 }
                 if ((int)$fileSize !== 0) {
                     $percentageSaved = (int)(100 - ((100 / $originalFileSize) * $fileSize));
-                    $this->addMessageToFlashMessageQueue('success', [0 => (string)$percentageSaved . '%'], FlashMessage::INFO);
+                    $this->addMessageToFlashMessageQueue(
+                        'success',
+                        [0 => $percentageSaved . '%'],
+                        ContextualFeedbackSeverity::INFO
+                    );
                 }
                 $this->updateFileInformation($file);
             } catch (\Exception $e) {
                 $this->saveError($file, $e);
-                $this->addMessageToFlashMessageQueue('compressionFailed', [0 => $e->getMessage()], FlashMessage::WARNING);
+                $this->addMessageToFlashMessageQueue(
+                    'compressionFailed',
+                    [0 => $e->getMessage()],
+                    ContextualFeedbackSeverity::WARNING
+                );
             }
         } else {
-            $this->addMessageToFlashMessageQueue('debugMode', [], FlashMessage::INFO);
+            $this->addMessageToFlashMessageQueue('debugMode', [], ContextualFeedbackSeverity::INFO);
         }
-    }
-
-    protected function getAbsoluteFileName(File $file): string
-    {
-        return urldecode(rtrim(Environment::getPublicPath(), '/') . '/' . ltrim($file->getPublicUrl(), '/'));
-    }
-
-    /**
-     * @param File $file
-     * @throws \Exception
-     */
-    protected function assureFileExists(File $file): void
-    {
-        $absFileName = $this->getAbsoluteFileName($file);
-        if (file_exists($absFileName) === false) {
-            throw new \Exception('file not exists: ' . $absFileName, 1575270381);
-        }
-        if ((int)filesize($absFileName) === 0) {
-            throw new \Exception('filesize is 0: ' . $absFileName, 1575270380);
-        }
-    }
-
-
-
-    /**
-     * @param File $file
-     * @return bool
-     */
-    protected function isFileInExcludeFolder(File $file): bool
-    {
-        if (!empty($this->extConf['excludeFolders'])) {
-            $excludeFolders = GeneralUtility::trimExplode(',', $this->extConf['excludeFolders'], true);
-            $identifier = $file->getIdentifier();
-            foreach ($excludeFolders as $excludeFolder) {
-                if (strpos($identifier, $excludeFolder) === 0) {
-                    $this->addMessageToFlashMessageQueue('folderExcluded', [0 => $excludeFolder], FlashMessage::INFO);
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
      * Check if the aus driver extension exists and is loaded.
-     * Additionally it checks if CDN is actually set and
+     * Additionally, it checks if CDN is actually set and
      * your located in the CDN section of the file list
-     *
-     * @param File $file
-     * @return bool
      */
     public function checkForAmazonCdn(File $file): bool
     {
@@ -204,9 +144,6 @@ class CompressImageService implements SingletonInterface
      * Overrides the original temp file with the compressed on.
      * Puts the compressed temp image to the actual storeage in file list -> CDN
      * Deletes old temp file.
-     *
-     * @param File $file
-     * @return int
      * @throws \Exception
      */
     public function pushToTinyPngAndStoreToCdn(File $file): int
@@ -216,7 +153,9 @@ class CompressImageService implements SingletonInterface
         $publicUrl = $file->getPublicUrl();
 
         // get the temp file and prefix with current time
-        $tempFile = $this->getPublicPath() . 'typo3temp' . DIRECTORY_SEPARATOR . time() . '_' . $this->getCdnFileName($publicUrl);
+        $tempFile = $this->getPublicPath() . 'typo3temp' . DIRECTORY_SEPARATOR . time() . '_' . $this->getCdnFileName(
+            $publicUrl
+        );
 
         $source = \Tinify\fromFile($publicUrl);
 
@@ -226,11 +165,13 @@ class CompressImageService implements SingletonInterface
         // upload to CDN
         $splFileObject = new \SplFileObject($tempFile);
         $fileSize = $splFileObject->getSize();
-        $this->client->putObject([
-            'Bucket' => $this->extConf['bucket'],
-            'Key' => $file->getIdentifier(),
-            'SourceFile' => $tempFile
-        ]);
+        $this->client->putObject(
+            [
+                'Bucket' => $this->extConf['bucket'],
+                'Key' => $file->getIdentifier(),
+                'SourceFile' => $tempFile,
+            ]
+        );
         // remove temp file
         GeneralUtility::unlink_tempfile($tempFile);
         return (int)$fileSize;
@@ -238,11 +179,8 @@ class CompressImageService implements SingletonInterface
 
     /**
      * This only works if file does not exist
-     *
-     * @param File $file
-     * @return boolean
      */
-    public function checkIfFolderIsCdn($file): bool
+    public function checkIfFolderIsCdn(File $file): bool
     {
         // if this is string, then we know, that there is already a file in the folder
         // In this case you have to check if the object in the bucket exists
@@ -256,34 +194,69 @@ class CompressImageService implements SingletonInterface
         return $file->getParentFolder()->getStorage()->getDriverType() === 'AusDriverAmazonS3';
     }
 
-    /**
-     * @param string $fileName
-     * @return string
-     */
     public function getCdnFileName(string $fileName): string
     {
         return preg_replace('/^.*\/(.*)$/', '$1', $fileName);
     }
 
+    protected function getPublicPath(): string
+    {
+        return Environment::getPublicPath() . '/';
+    }
+
+    protected function getAbsoluteFileName(File $file): string
+    {
+        return urldecode(
+            rtrim(Environment::getPublicPath(), '/') . '/' . ltrim($file->getPublicUrl(), '/')
+        );
+    }
+
     /**
-     * @return string
+     * @throws \Exception
      */
+    protected function assureFileExists(File $file): void
+    {
+        $absFileName = $this->getAbsoluteFileName($file);
+        if (file_exists($absFileName) === false) {
+            throw new \RuntimeException('Tinyimg: File does not exist: ' . $absFileName, 1575270381);
+        }
+        if ((int)filesize($absFileName) === 0) {
+            throw new \RuntimeException('Tinyimg: Filesize is 0: ' . $absFileName, 1575270380);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function isFileInExcludeFolder(File $file): bool
+    {
+        if (!empty($this->extConf['excludeFolders'])) {
+            $excludeFolders = GeneralUtility::trimExplode(',', $this->extConf['excludeFolders'], true);
+            $identifier = $file->getIdentifier();
+            foreach ($excludeFolders as $excludeFolder) {
+                if (str_starts_with($identifier, $excludeFolder)) {
+                    $this->addMessageToFlashMessageQueue(
+                        'folderExcluded',
+                        [0 => $excludeFolder],
+                        ContextualFeedbackSeverity::INFO
+                    );
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     protected function getApiKey(): string
     {
         return (string)$this->extConf['apiKey'];
     }
 
-    /**
-     * @return boolean
-     */
     protected function getUseCdn(): bool
     {
         return (bool)$this->extConf['useCdn'];
     }
 
-    /**
-     * @param File $file
-     */
     protected function updateFileInformation(File $file): void
     {
         $storage = $file->getStorage();
@@ -292,10 +265,8 @@ class CompressImageService implements SingletonInterface
     }
 
     /**
-     * @param File $file
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
-     * @return int
+     * @throws IllegalObjectTypeException
+     * @throws UnknownObjectException
      */
     protected function setCompressedForCurrentFile(File $file): ?int
     {
@@ -309,34 +280,29 @@ class CompressImageService implements SingletonInterface
             clearstatcache();
             $splFileObject = new \SplFileObject($this->getAbsoluteFileName($file));
             return (int)$splFileObject->getSize();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }
 
-    /**
-     * @return bool
-     */
     protected function isCli(): bool
     {
         return Environment::isCli();
     }
 
-
     /**
-     * @param string $key
-     * @param array $replaceMarkers
-     * @param int $severity
-     * @throws \TYPO3\CMS\Core\Exception
+     * @throws Exception
      */
-    protected function addMessageToFlashMessageQueue($key, array $replaceMarkers = [], $severity = FlashMessage::ERROR): void
-    {
+    protected function addMessageToFlashMessageQueue(
+        string $key,
+        array $replaceMarkers = [],
+        ContextualFeedbackSeverity $severity = ContextualFeedbackSeverity::ERROR
+    ): void {
         if ($this->isCli()) {
             return;
         }
 
-        $localizationUtility = GeneralUtility::makeInstance(LocalizationUtility::class);
-        $message = $localizationUtility->translate(
+        $message = LocalizationUtility::translate(
             'LLL:EXT:tinyimg/Resources/Private/Language/locallang.xlf:flashMessage.message.' . $key,
             null,
             $replaceMarkers
@@ -344,7 +310,9 @@ class CompressImageService implements SingletonInterface
         $flashMessage = GeneralUtility::makeInstance(
             FlashMessage::class,
             $message,
-            $localizationUtility->translate('LLL:EXT:tinyimg/Resources/Private/Language/locallang.xlf:flashMessage.title'),
+            LocalizationUtility::translate(
+                'LLL:EXT:tinyimg/Resources/Private/Language/locallang.xlf:flashMessage.title'
+            ),
             $severity,
             true
         );
@@ -355,10 +323,10 @@ class CompressImageService implements SingletonInterface
     }
 
     /**
-     * @param File $file
-     * @param \Exception $e
+     * @throws UnknownObjectException
+     * @throws IllegalObjectTypeException
      */
-    protected function saveError(File $file, \Exception $e)
+    protected function saveError(File $file, \Exception $e): void
     {
         /** @var \Schmitzal\Tinyimg\Domain\Model\File $extbaseFileObject */
         $extbaseFileObject = $this->fileRepository->findByUid($file->getUid());

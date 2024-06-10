@@ -1,151 +1,85 @@
 <?php
+
 namespace Schmitzal\Tinyimg\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-/**
- * Class FileStorage
- * @package Schmitzal\Tinyimg\Domain\Model
- */
 class FileStorage extends AbstractEntity
 {
-    /**
-     * @var string
-     */
-    protected $name = '';
-    /**
-     * @var string
-     */
-    protected $description = '';
-    /**
-     * @var bool
-     */
-    protected $default = false;
-    /**
-     * @var bool
-     */
-    protected $browsable = false;
-    /**
-     * @var bool
-     */
-    protected $public = false;
-    /**
-     * @var bool
-     */
-    protected $writable = false;
-    /**
-     * @var bool
-     */
-    protected $online = false;
+    protected string $name = '';
+    protected string $description = '';
+    protected bool $default = false;
+    protected bool $browsable = false;
+    protected bool $public = false;
+    protected bool $writable = false;
+    protected bool $online = false;
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
-    /**
-     * @return bool
-     */
     public function isDefault(): bool
     {
         return $this->default;
     }
 
-    /**
-     * @param bool $default
-     */
-    public function setDefault(bool $default)
+    public function setDefault(bool $default): void
     {
         $this->default = $default;
     }
 
-    /**
-     * @return bool
-     */
     public function isBrowsable(): bool
     {
         return $this->browsable;
     }
 
-    /**
-     * @param bool $browsable
-     */
-    public function setBrowsable(bool $browsable)
+    public function setBrowsable(bool $browsable): void
     {
         $this->browsable = $browsable;
     }
 
-    /**
-     * @return bool
-     */
     public function isPublic(): bool
     {
         return $this->public;
     }
 
-    /**
-     * @param bool $public
-     */
-    public function setPublic(bool $public)
+    public function setPublic(bool $public): void
     {
         $this->public = $public;
     }
 
-    /**
-     * @return bool
-     */
     public function isWritable(): bool
     {
         return $this->writable;
     }
 
-    /**
-     * @param bool $writable
-     */
-    public function setWritable(bool $writable)
+    public function setWritable(bool $writable): void
     {
         $this->writable = $writable;
     }
 
-    /**
-     * @return bool
-     */
     public function isOnline(): bool
     {
         return $this->online;
     }
 
-    /**
-     * @param bool $online
-     */
-    public function setOnline(bool $online)
+    public function setOnline(bool $online): void
     {
         $this->online = $online;
     }
