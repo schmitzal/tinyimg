@@ -12,9 +12,8 @@ This API can reduce up to 80% of the file size of your images, which will increa
 ## Configuration
 1. Create an API key* at https://tinypng.com/developers
 2. Enter the API key* in the extension configuration
-3. TYPO3 < 12: Include the static TypoScript. It disables compression while on application context "Development", so you won't lose compressions during development and testing 
-4. TYPO3 >= 12: Disables compression in extension settings if desired, so you won't lose compressions during development and testing
-5. Have a nice day :)
+3. Disables compression in extension settings if desired, so you won't lose compressions during development and testing
+4. Have a nice day :)
 
 <span style="font-size: 80%">_*Note that the tinify API is limited to 500 compressions per month.
 If you need more, there is a paid version which can be activated in your dashboard (where you got your API key)_</span>
@@ -33,7 +32,7 @@ Configuration has been moved to extension settings
 ## Contribution
 Bugs and feature requests are welcome. Feel free to create an [issue](https://github.com/schmitzal/tinyimg/issues), and I'll have a look at it as soon as possible.
 
-Code improvements are also highly appreciated, as I'm a young developer and sure there is stuff to optimize.
+Code improvements are also highly appreciated.
 
 ## Sponsoring
 This extension is powered by [OPEN Digitalgruppe GmbH](https://www.open.de/).
