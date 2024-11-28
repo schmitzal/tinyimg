@@ -83,6 +83,8 @@ class CompressImageService implements SingletonInterface
                 [
                 'image/png',
                 'image/jpeg',
+                'image/webp',
+                'image/apng'
                 ],
                 true
             )
