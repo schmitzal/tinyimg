@@ -41,7 +41,7 @@ final class CompressImagesCommand extends Command
         private readonly FileRepository $fileRepository,
         private readonly ResourceFactory $resourceFactory,
         private readonly CompressImageService $compressImageService,
-        string $name = null
+        ?string $name = null
     ) {
         parent::__construct($name);
     }
