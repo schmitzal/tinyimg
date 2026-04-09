@@ -1,13 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Schmitzal\Tinyimg\Domain\Repository;
 
-use Schmitzal\Tinyimg\Domain\Model\File;
 use Schmitzal\Tinyimg\Domain\Model\FileStorage;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Exception\InvalidQueryException;
-use TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;

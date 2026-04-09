@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> "$GITHUB_OUTPUT"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -28,7 +28,7 @@ jobs:
           extensions: intl, mbstring, xml, soap, zip, curl
 
       - name: Install EXT:tailor
-        run: composer global require typo3/tailor --prefer-dist --no-progress --no-suggest
+        run: composer global require typo3/tailor --prefer-dist --no-progress
 
       - name: Upload EXT:${{ env.EXTENSION_KEY }} as ${{ steps.get_version.outputs.VERSION }} to TER
         run: php ~/.composer/vendor/bin/tailor ter:publish ${{ steps.get_version.outputs.VERSION }} --artefact=${{ env.REPOSITORY_URL }}/archive/${{ steps.get_version.outputs.VERSION }}.zip --comment="${{ env.REPOSITORY_URL }}/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md"

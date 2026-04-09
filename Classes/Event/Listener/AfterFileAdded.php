@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Schmitzal\Tinyimg\Event\Listener;
 
 use Schmitzal\Tinyimg\Service\CompressImageService;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Resource\Event\AfterFileAddedEvent;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 
@@ -23,7 +26,9 @@ final readonly class AfterFileAdded
      */
     public function __invoke(AfterFileAddedEvent $event): AfterFileAddedEvent
     {
-        $this->compressImageService->initializeCompression($event->getFile());
+        /** @var File $file */
+        $file = $event->getFile();
+        $this->compressImageService->initializeCompression($file);
         return $event;
     }
 }
