@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Schmitzal\Tinyimg\Service;
 
-use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Schmitzal\Tinyimg\Domain\Repository\FileRepository;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
@@ -11,7 +12,6 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -23,7 +23,7 @@ use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
-class CompressImageService implements SingletonInterface
+class CompressImageService
 {
     protected array $extConf = [];
     protected ?S3Client $client = null;
@@ -37,8 +37,10 @@ class CompressImageService implements SingletonInterface
     ];
 
     public function __construct(
-        protected FileRepository $fileRepository,
-        protected PersistenceManager $persistenceManager
+        protected readonly FileRepository $fileRepository,
+        protected readonly PersistenceManager $persistenceManager,
+        protected readonly ExtensionConfiguration $extensionConfiguration,
+        protected readonly FlashMessageService $flashMessageService,
     ) {
     }
 
@@ -48,7 +50,7 @@ class CompressImageService implements SingletonInterface
      */
     public function initAction(): void
     {
-        $this->extConf = (GeneralUtility::makeInstance(ExtensionConfiguration::class))->get('tinyimg');
+        $this->extConf = $this->extensionConfiguration->get('tinyimg');
 
         if (ExtensionManagementUtility::isLoaded('aus_driver_amazon_s3')) {
             $this->initCdn();
@@ -59,7 +61,6 @@ class CompressImageService implements SingletonInterface
 
     public function initCdn(): void
     {
-        /** @var S3Client client */
         $this->client = S3Client::factory(
             [
                 'region' => $this->extConf['region'],
@@ -259,7 +260,7 @@ class CompressImageService implements SingletonInterface
     protected function updateFileInformation(File $file): void
     {
         $storage = $file->getStorage();
-        $fileIndexer = GeneralUtility::makeInstance(Indexer::class, $storage);
+        $fileIndexer = new Indexer($storage);
         $fileIndexer->updateIndexEntry($file);
     }
 
@@ -306,8 +307,7 @@ class CompressImageService implements SingletonInterface
             null,
             $replaceMarkers
         );
-        $flashMessage = GeneralUtility::makeInstance(
-            FlashMessage::class,
+        $flashMessage = new FlashMessage(
             $message,
             LocalizationUtility::translate(
                 'LLL:EXT:tinyimg/Resources/Private/Language/locallang.xlf:flashMessage.title'
@@ -316,8 +316,7 @@ class CompressImageService implements SingletonInterface
             true
         );
 
-        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-        $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
+        $defaultFlashMessageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
     }
 

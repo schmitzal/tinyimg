@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Schmitzal\Tinyimg\Command;
 
 use Schmitzal\Tinyimg\Domain\Model\File;
@@ -41,9 +43,11 @@ final class CompressImagesCommand extends Command
         private readonly FileRepository $fileRepository,
         private readonly ResourceFactory $resourceFactory,
         private readonly CompressImageService $compressImageService,
-        ?string $name = null
+        private readonly ExtensionConfiguration $extensionConfiguration,
+        private readonly CacheManager $cacheManager,
+        private readonly FileDeletionAspect $fileDeletionAspect,
     ) {
-        parent::__construct($name);
+        parent::__construct();
     }
 
     protected function configure(): void
@@ -69,7 +73,7 @@ final class CompressImagesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit = (int)$input->getArgument('limit');
-        $settings = (GeneralUtility::makeInstance(ExtensionConfiguration::class))->get('tinyimg');
+        $settings = $this->extensionConfiguration->get('tinyimg');
         /** @var FileStorage $fileStorage */
         foreach ($this->fileStorageRepository->findAll() as $fileStorage) {
             $excludeFolders = GeneralUtility::trimExplode(',', (string)($settings['excludeFolders'] ?? ''), true);
@@ -84,7 +88,7 @@ final class CompressImagesCommand extends Command
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
@@ -95,13 +99,12 @@ final class CompressImagesCommand extends Command
      */
     protected function compressImages(QueryResultInterface $files): void
     {
-        $fileDeletionAspect = GeneralUtility::makeInstance(FileDeletionAspect::class);
         /** @var File $file */
         foreach ($files as $file) {
             if ($file instanceof File) {
                 $file = $this->resourceFactory->getFileObject($file->getUid());
                 $this->compressImageService->initializeCompression($file);
-                $fileDeletionAspect->cleanupProcessedFilesPostFileReplace(
+                $this->fileDeletionAspect->cleanupProcessedFilesPostFileReplace(
                     new AfterFileReplacedEvent($file, '')
                 );
             }
@@ -114,7 +117,6 @@ final class CompressImagesCommand extends Command
      */
     protected function clearPageCache(): void
     {
-        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-        $cacheManager->flushCachesInGroup('pages');
+        $this->cacheManager->flushCachesInGroup('pages');
     }
 }

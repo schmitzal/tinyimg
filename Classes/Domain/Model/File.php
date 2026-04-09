@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Schmitzal\Tinyimg\Domain\Model;
 
 class File extends \TYPO3\CMS\Extbase\Domain\Model\File
