@@ -12,6 +12,9 @@ jobs:
   phpcs:
     runs-on: ubuntu-latest
 
+    env:
+      TYPO3_SKIP_ASSET_PUBLISH: 1
+
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
@@ -19,7 +22,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: mbstring, xml
 
       - name: Install dependencies
