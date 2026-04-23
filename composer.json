@@ -2,7 +2,7 @@
     "name": "schmitzal/tinyimg",
     "description": "Image compression for all pngs and jpgs uploaded to the backend (using the tinypng API)",
     "type": "typo3-cms-extension",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "keywords": [
         "image",
         "compression",
@@ -22,7 +22,7 @@
         "issues": "https://github.com/schmitzal/tinyimg/issues"
     },
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "typo3/cms-core": "^13.4",
         "typo3/cms-extbase": "*",
         "typo3/cms-filelist": "*",

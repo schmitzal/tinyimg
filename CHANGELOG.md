@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.8.1
+* **[CHANGE]** Allow for WebP and APNG to be sent to TinyPNG - Thanks to @sorenmalling
+* **[CHANGE]** Add image/avif as allowed mime type for compression
+* **[FIX]** Fix nullable name parameter in CompressImagesCommand to avoid HP deprecation warnings - Thanks to @konradmichalik
+
 ### 1.8.0
 * **[FEATURE]** Make extension compatible with TYPO3 13, including full refactoring and dropping TYPO3 10, 11 and 12 support
 
