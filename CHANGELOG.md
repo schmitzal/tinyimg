@@ -1,5 +1,8 @@
 # Changelog
 
+### 1.9.0
+* **[FEATURE]** Add support for TYPO3 14
+
 ### 1.8.1
 * **[CHANGE]** Allow for WebP and APNG to be sent to TinyPNG - Thanks to @sorenmalling
 * **[CHANGE]** Add image/avif as allowed mime type for compression
