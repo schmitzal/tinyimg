@@ -2,7 +2,7 @@
     "name": "schmitzal/tinyimg",
     "description": "Image compression for all pngs and jpgs uploaded to the backend (using the tinypng API)",
     "type": "typo3-cms-extension",
-    "version": "1.8.1",
+    "version": "1.9.0",
     "keywords": [
         "image",
         "compression",
