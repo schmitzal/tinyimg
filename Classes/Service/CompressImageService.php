@@ -28,6 +28,14 @@ class CompressImageService implements SingletonInterface
     protected array $extConf = [];
     protected ?S3Client $client = null;
 
+    protected array $allowedMimeTypes = [
+        'image/png',
+        'image/jpeg',
+        'image/webp',
+        'image/apng',
+        'image/avif',
+    ];
+
     public function __construct(
         protected FileRepository $fileRepository,
         protected PersistenceManager $persistenceManager
@@ -77,18 +85,7 @@ class CompressImageService implements SingletonInterface
             return;
         }
 
-        if (
-            !in_array(
-                strtolower($file->getMimeType()),
-                [
-                'image/png',
-                'image/jpeg',
-                'image/webp',
-                'image/apng'
-                ],
-                true
-            )
-        ) {
+        if (!in_array(strtolower($file->getMimeType()), $this->allowedMimeTypes, true)) {
             return;
         }
 
